@@ -14,6 +14,7 @@ main()
 }
 
 /*
+$ gcc -std=c89 exercise18.c
 $ ./a.out 
 abc     def ghi
 Found 3 special characters
