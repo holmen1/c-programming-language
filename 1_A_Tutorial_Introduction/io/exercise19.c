@@ -1,27 +1,18 @@
 #include <stdio.h>
 
-
-/*
-copy input to output, replacing each string of one or more blanks by a single blank
-*/
 main()
 {
-  int c;
-  int last_c = '\0';
+  int c, blanks;
+  blanks = 0;
 
   while ((c = getchar()) != EOF)
   {
-    if (c != ' ' || last_c != ' ')
-    {
-      putchar(c);
-    }
+    if (c == ' ')
+      ++blanks;
+    else
+      blanks = 0;
 
-    last_c = c;
+    if (blanks <= 1)
+      putchar(c);
   }
 }
-
-/*
-$ ./a.out 
-Hello   World !
-Hello World !
-*/
