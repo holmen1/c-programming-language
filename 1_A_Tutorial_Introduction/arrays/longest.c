@@ -34,7 +34,7 @@ int getline(char s[], int lim)
     s[i] = c;
     ++i;
   }
-  s[i] = '\0';
+  s[i] = '\0'; /* array of characters terminated by '\0' */
   return i;
 }
 
@@ -51,4 +51,22 @@ void copy(char to[], char from[])
 $ gcc -std=c89 longest.c -o longest
 $ ./longest < longest.c 
   for (i=0; i<lim-1 && (c=getchar()) != EOF && c != '\n'; ++i)
+*/
+
+/* LESSONS LEARNED
+Need c89 since gcc defaults to c17
+
+$ gcc longest.c 
+longest.c:4:5: error: conflicting types for ‘getline’; have ‘int(char *, int)’
+    4 | int getline(char line[], int maxline);
+      |     ^~~~~~~
+In file included from longest.c:1:
+/usr/include/stdio.h:697:18: note: previous declaration of ‘getline’ with type ‘__ssize_t(char ** restrict,  size_t * restrict,  FILE * restrict)’ {aka ‘long int(char ** restrict,  long unsigned int * restrict,  FILE * restrict)’}
+  697 | extern __ssize_t getline (char **__restrict __lineptr,
+      |                  ^~~~~~~
+longest.c:27:5: error: conflicting types for ‘getline’; have ‘int(char *, int)’
+   27 | int getline(char s[], int lim)
+      |     ^~~~~~~
+/usr/include/stdio.h:697:18: note: previous declaration of ‘getline’ with type ‘__ssize_t(char ** restrict,  size_t * restrict,  FILE * restrict)’ {aka ‘long int(char ** restrict,  long unsigned int * restrict,  FILE * restrict)’}
+  697 | extern __ssize_t getline (char **__restrict __lineptr,
 */
