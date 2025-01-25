@@ -3,7 +3,7 @@
 #define TRAILING 0
 #define LINE 1
 
-int get_line(char line[], int maxline);
+int get_line(char s[], int maxline);
 void trim(char to[], char from[]);
 
 int main()
@@ -20,12 +20,11 @@ int main()
   return 0;
 }
 
-
-int get_line(char s[], int lim)
+int get_line(char s[], int maxline)
 {
   int c, i;
 
-  for (i=0; i<lim-1 && (c=getchar()) != EOF && c != '\n'; ++i)
+  for (i=0; i<maxline-1 && (c=getchar()) != EOF && c != '\n'; ++i)
     s[i] = c;
   if (c == '\n') {
     s[i] = c;
@@ -39,13 +38,11 @@ void trim(char to[], char from[])
 {
   int c,i,j;
   int state = TRAILING;
-  i = 0;
+  i = j = 0;
   while ((c = from[i]) != '\0')
   {
-    if (state == TRAILING && (c != ' ' || c != '\t')) {
+    if (state == TRAILING && c != ' ')
       state = LINE;
-      j = 0;
-    }
 
     if (state == LINE) {
       to[j] = c;
@@ -58,7 +55,7 @@ void trim(char to[], char from[])
 
 /*
 $ gcc -std=c89 longest.c -o longest
-$ ./longest < longest.c 
+$ ./longest < longest.c
   for (i=0; i<lim-1 && (c=getchar()) != EOF && c != '\n'; ++i)
 */
 
