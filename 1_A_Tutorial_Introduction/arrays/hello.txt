@@ -1,5 +1,6 @@
+/*Hello*/
 Hello World!
-  Hello World!
+  Hello /* comment */ World!
 
 Hello Mats
 a
