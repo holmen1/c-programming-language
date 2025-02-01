@@ -39,27 +39,36 @@ int get_line(char s[], int maxline)
 
 void uncomment(char to[], char from[])
 {
-  int c,c_prev,i,j;
+  int c, i, j;
   extern int state;
   i = j = 0;
-  while ((c = from[i]) != '\0')
+  while ((c = from[i]) != '\n')
   {
-    if (c_prev == '/' && c == '*')
+    if (c == '/' && from[i+1] == '*')
       state = COMMENT;
-    else if (c_prev == '*' && c == '/')
+    else if (c == '*' && from[i+1]  == '/') {
       state = LINE;
+      i = i + 2;
+    }
 
-    if (state == LINE) {
+    if (state == LINE && (c = from[i]) != '\n') {
       to[j] = c;
       ++j;
     }
     ++i;
   }
-  to[j] = '\0';
+  to[j] = '\n';
+  to[j+1] = '\0';
 }
 
 /*
-$ gcc -std=c90 trim.c 
-$ ./a.out < trim.c 
+$ gcc -g -Wall -std=c90 uncomment.c
+$ ./a.out < hello.txt 
+Hello World!
+  Hello  World!
+
+Hello Mats
+a
+ab
 */
 

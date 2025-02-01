@@ -4,4 +4,5 @@ Hello World!
 
 Hello Mats
 a
+/* comment */
 ab
