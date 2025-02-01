@@ -6,3 +6,10 @@ Hello Mats
 a
 /* comment */
 ab
+
+/*
+ * multiline comment
+ *
+*/
+
+last line
