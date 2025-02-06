@@ -1,4 +1,5 @@
 /* Exercise 2-3 */
+#include <ctype.h>
 #include <stdio.h>
 
 
@@ -21,9 +22,9 @@ int htoi(char s[])
 
   if (s[0] == '0' && s[1] == 'x') {
     n = 0;
-    for (i = 2; (s[i] >= '0' && s[i] <= '9') || (s[i] >= 'a' && s[i] <= 'f'); ++i)
+    for (i = 2; isdigit(s[i]) || (s[i] >= 'a' && s[i] <= 'f'); ++i)
     {
-      if (s[i] <= '9')
+      if (s[i] < 'a')
         n = 16 * n + (s[i] - '0');
       else
         n = 16 * n + (s[i] - 'W');
