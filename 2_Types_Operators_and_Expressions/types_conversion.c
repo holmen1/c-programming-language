@@ -23,9 +23,9 @@ int htoi(char s[])
     n = 0;
     for (i = 2; (s[i] >= '0' && s[i] <= '9') || (s[i] >= 'a' && s[i] <= 'f'); ++i)
     {
-      if (s[i] >= '0' && s[i] <= '9')
+      if (s[i] <= '9')
         n = 16 * n + (s[i] - '0');
-      if (s[i] >= 'a' && s[i] <= 'f')
+      else
         n = 16 * n + (s[i] - 'W');
     }
     return n;
