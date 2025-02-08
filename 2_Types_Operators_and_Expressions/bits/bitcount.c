@@ -45,24 +45,10 @@ int main() {
 }
 
 /*
-$ gcc -g -Wall -std=c90 bitwise.c 
+$ gcc -g -Wall -std=c90 bitcount.c 
 $ ./a.out 
-Decimal 'a'     =       97
-Binary 'a'      =       00000000000000000000000001100001
-
-
-- complement
-n               =       77
-Binary n        =       00000000000000000000000001001101
-Binary ~n       =       11111111111111111111111110110010
-Binary ~n+1     =       11111111111111111111111110110011
-Decimal ~n+1    =       -77
-getbits(n,6,4)  =       00000000000000000000000000001001
-
-- setbits
+Decimal x       =       170
 Binary x        =       00000000000000000000000010101010
-Binary y        =       00000000000000000000000011001100
-p               =       4
-n               =       3
-setbits(x,p,n,y)=       00000000000000000000000010110010
+bitcount(x)     =       4
+bitcount2(x)    =       4
 */
