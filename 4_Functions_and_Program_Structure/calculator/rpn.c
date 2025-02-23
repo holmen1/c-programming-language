@@ -3,12 +3,16 @@
 //
 #include <assert.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 #define MAXVAL 100 /* maximum depth of val stack */
+#define MAXOP 100 /* maximum depth of operand or operator */
 #define NUMBER '0'
 #define BUFSIZE 100 /* maximum buffer size */
 
+
+/* --- STACK --- */
 int sp = 0;
 double val[MAXVAL];
 
@@ -74,6 +78,7 @@ void ungetch(int c) /* push character back to input */
 
 /* --- ASSERTS --- */
 void test_push_pop() {
+    int i;
     // Test pushing and popping a single value
     push(1.0);
     assert(pop() == 1.0);
@@ -88,10 +93,11 @@ void test_push_pop() {
     assert(pop() == 0.0); // Should print "error: stack empty"
 
     // Test pushing to a full stack
-    for (int i = 0; i < MAXVAL; i++) {
+    for (i = 0; i < MAXVAL; i++) {
         push(i);
     }
     push(MAXVAL); // Should print "error: stack full"
+    i = 0; /* empty stack */
 }
 
 void test_getch_ungetch() {
@@ -99,26 +105,53 @@ void test_getch_ungetch() {
 
     ungetch('a');
     assert(getch() == 'a');
-
-    // Test buffer overflow
-    for (i = 0; i < BUFSIZE; i++) {
-        ungetch('a');
-    }
-    ungetch('b'); // This should print an error message
-
-    // Test getch with no ungetch
-    assert(getch() == 'a'); // Last character pushed back
-    for (i = 0; i < BUFSIZE - 1; i++) {
-    }
-    // Now the buffer should be empty, getch should call getchar()
-    // We can't test getchar() easily without user input, so we stop here
 }
 
 int main() {
-    test_push_pop();
-    test_getch_ungetch();
-    printf("All tests passed.\n");
+    //test_push_pop();
+    //test_getch_ungetch();
+    //printf("All tests passed.\n");
+
+    int type;
+    double op2;
+    char s[MAXOP];
+
+    while ((type = getop(s)) != EOF) {
+        switch (type) {
+            case NUMBER:
+                push(atof(s));
+                break;
+            case '+':
+                push(pop() + pop());
+                break;
+            case '*':
+                push(pop() * pop());
+                break;
+            case '-':
+                op2 = pop();
+                push(pop() - op2);
+                break;
+            case '/':
+                op2 = pop();
+                if (op2 != 0.0)
+                    push(pop() / op2);
+                else
+                    printf("error: zero divisor\n");
+                break;
+            case '\n':
+                printf("\t%.8g\n", pop());
+                break;
+            default:
+                printf("error: unknown command %s\n", s);
+                break;
+        }
+    }
     return 0;
 }
-
+/*
+$ gcc -std=c90 rpn.c
+$ ./a.out
+5 12.0 3 / *
+        20
+*/
 
