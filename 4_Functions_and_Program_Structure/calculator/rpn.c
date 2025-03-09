@@ -1,6 +1,3 @@
-//
-//
-//
 #include <assert.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -79,24 +76,24 @@ void ungetch(int c) /* push character back to input */
 /* --- ASSERTS --- */
 void test_push_pop() {
     int i;
-    // Test pushing and popping a single value
+    /* Test pushing and popping a single value */
     push(1.0);
     assert(pop() == 1.0);
 
-    // Test pushing and popping multiple values
+    /* Test pushing and popping multiple values */
     push(2.0);
     push(3.0);
     assert(pop() == 3.0);
     assert(pop() == 2.0);
 
-    // Test popping from an empty stack
-    assert(pop() == 0.0); // Should print "error: stack empty"
+    /* Test popping from an empty stack */
+    assert(pop() == 0.0); /* Should print "error: stack empty" */
 
-    // Test pushing to a full stack
+    /* Test pushing to a full stack */
     for (i = 0; i < MAXVAL; i++) {
         push(i);
     }
-    push(MAXVAL); // Should print "error: stack full"
+    push(MAXVAL); /* Should print "error: stack full" */
     i = 0; /* empty stack */
 }
 
@@ -108,9 +105,11 @@ void test_getch_ungetch() {
 }
 
 int main() {
-    //test_push_pop();
-    //test_getch_ungetch();
-    //printf("All tests passed.\n");
+    /*
+    test_push_pop();
+    test_getch_ungetch();
+    printf("All tests passed.\n");
+    */
 
     int type;
     double op2;
