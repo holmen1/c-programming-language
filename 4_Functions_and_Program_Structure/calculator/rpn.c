@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 
 #define MAXOP 100 /* maximum depth of operand or operator */
@@ -36,6 +37,13 @@ int main() {
                 op2 = pop();
                 if (op2 != 0.0)
                     push(pop() / op2);
+                else
+                    printf("error: zero divisor\n");
+                break;
+            case '%':
+                op2 = pop();
+                if (op2 != 0.0)
+                    push(fmod(pop(), op2));
                 else
                     printf("error: zero divisor\n");
                 break;
@@ -123,4 +131,6 @@ $ gcc -std=c90 rpn.c
 $ ./a.out
 5 12.0 3 / *
         20
+11.0 3.0 %
+        2
 */
