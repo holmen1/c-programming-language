@@ -23,6 +23,8 @@
 *.bak
 *.old
 
+cmake-build-debug/
+
 # IDE specific files
 .vscode/
 .idea/
