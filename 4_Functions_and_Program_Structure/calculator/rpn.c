@@ -7,7 +7,9 @@
 #define NUMBER '0'
 
 int getop(char s[]);
+
 void push(double f);
+
 double pop(void);
 
 int main() {
@@ -73,24 +75,21 @@ double pop(void) {
 
 /* getop: get next operator or numeric operand */
 int getch(void);
+
 void ungetch(int);
 
-int getop(char s[])
-{
+int getop(char s[]) {
     int i, c;
 
-    while ((s[0] = c = getch()) == ' ' || c == '\t')
-        ;
+    while ((s[0] = c = getch()) == ' ' || c == '\t');
     s[1] = '\0';
     if (!isdigit(c) && c != '.')
         return c;
     i = 0;
     if (isdigit(c))
-        while (isdigit(s[++i] = c = getch()))
-            ;
+        while (isdigit(s[++i] = c = getch()));
     if (c == '.')
-        while (isdigit(s[++i] = c = getch()))
-            ;
+        while (isdigit(s[++i] = c = getch()));
     s[i] = '\0';
     if (c != EOF)
         ungetch(c);
@@ -119,11 +118,9 @@ void ungetch(int c) /* push character back to input */
 }
 
 
-
 /*
 $ gcc -std=c90 rpn.c
 $ ./a.out
 5 12.0 3 / *
         20
 */
-
