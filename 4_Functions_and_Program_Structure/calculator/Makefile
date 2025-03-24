@@ -1,35 +1,19 @@
-# Compiler to use
-CC = gcc
+calculator: getch.o getop.o stack.o main.o
+	gcc -std=c90 -Wall -o calculator getch.o getop.o stack.o main.o -lm
 
-# Compiler flags
-CFLAGS = -std=c90 -Wall
+getch.o: getch.c
+	gcc -std=c90 -Wall -c getch.c -o getch.o
 
-# Linker flags
-LDFLAGS = -lm
+getop.o: getop.c
+	gcc -std=c90 -Wall -c getop.c -o getop.o
 
-# Name of the output executable
-TARGET = calculator
+stack.o: stack.c
+	gcc -std=c90 -Wall -c stack.c -o stack.o
 
-# Source files
-SRCS = getch.c getop.c stack.c main.c
+main.o: main.c
+	gcc -std=c90 -Wall -c main.c -o main.o
 
-# Object files (derived from source files)
-OBJS = getch.o getop.o stack.o main.o
-
-# Default target to build the executable
-all: $(TARGET)
-
-# Rule to link object files into the executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
-
-# Rule to compile source files into object files
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-# Rule to clean up build files
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f *.o calculator
 
-# Declare targets that are not actual files
-.PHONY: all clean
+.PHONY: clean
