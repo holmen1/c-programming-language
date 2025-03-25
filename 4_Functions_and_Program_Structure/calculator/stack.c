@@ -26,10 +26,18 @@ void peek(void) {
         printf("top of stack: %.8g\n", val[sp - 1]);
     else
         printf("stack underlow\n");
+}
 
+void swap(void) {
+    if (sp > 1) {
+        double temp = val[sp - 1];
+        val[sp - 1] = val[sp - 2];
+        val[sp - 2] = temp;
+    } else {
+        printf("error: not enough elements to swap\n");
+    }
+}
 
-
-
-
-
+void clear(void) {
+    sp = 0;
 }

@@ -8,6 +8,8 @@ int main() {
     /* tests */
     test_push_pop();
     test_peek();
+    test_swap();
+    test_clear();
     test_operations();
     test_division_by_zero();
     printf("All tests passed\n");

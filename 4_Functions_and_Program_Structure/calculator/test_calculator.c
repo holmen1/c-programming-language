@@ -23,6 +23,29 @@ void test_peek() {
     printf("test_peek underflow passed\n");
 }
 
+void test_swap() {
+    push(1.0);
+    push(2.0);
+    swap(); /* Should swap the top two elements */
+    assert(pop() == 1.0);
+    assert(pop() == 2.0);
+    printf("test_swap passed\n");
+
+    /* Test swap with insufficient elements */
+    push(3.0);
+    swap(); /* Should print "error: not enough elements to swap" */
+    assert(pop() == 3.0);
+    printf("test_swap insufficient elements passed\n");
+}
+
+void test_clear() {
+    push(1.0);
+    push(2.0);
+    clear(); /* Should clear the stack */
+    assert(pop() == 0.0); /* Stack should be empty */
+    printf("test_clear passed\n");
+}
+
 void test_operations() {
     double op2;
 
