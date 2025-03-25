@@ -5,6 +5,14 @@
 #define MAXOP 100 /* maximum depth of operand or operator */
 
 int main() {
+    /* tests */
+    test_push_pop();
+    test_peek();
+    test_operations();
+    test_division_by_zero();
+    printf("All tests passed\n");
+
+
     int type;
     double op1, op2;
     char s[MAXOP];
@@ -51,5 +59,5 @@ int main() {
 }
 
 /*
-$ gcc -std=c90 -Wall -o calculator getch.c getop.c stack.c main.c -lm
+$ gcc -std=c90 -Wall -o calculator getch.c getop.c stack.c main.c
 */
