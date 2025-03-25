@@ -20,8 +20,16 @@ double pop(void) {
 }
 
 void peek(void) {
-    if (sp < 0)
-        printf("error: stack underflow\n");
+    if (sp > MAXVAL)
+        printf("error: stack overflow\n");
+    else if (sp > 0)
+        printf("top of stack: %.8g\n", val[sp - 1]);
     else
-        printf("Top of stack: %g\n", val[sp - 1]);
+        printf("stack underlow\n");
+
+
+
+
+
+
 }

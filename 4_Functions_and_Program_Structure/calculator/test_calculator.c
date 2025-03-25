@@ -17,6 +17,10 @@ void test_peek() {
     assert(pop() == 4.0);
     assert(pop() == 3.0);
     printf("test_peek passed\n");
+
+    /* Test peek underflow */
+    peek(); /* Should print "stack underflow" */
+    printf("test_peek underflow passed\n");
 }
 
 void test_operations() {
