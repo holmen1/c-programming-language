@@ -1,13 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
 #include "calc.h"
 
 #define MAXOP 100 /* maximum depth of operand or operator */
 
 int main() {
     int type;
-    double op2;
+    double op1, op2;
     char s[MAXOP];
 
     while ((type = getop(s)) != EOF) {
@@ -34,8 +33,9 @@ int main() {
             break;
             case '%':
                 op2 = pop();
+                op1 = pop();
             if (op2 != 0.0)
-                push(fmod(pop(), op2));
+                push(op1 - op2 * (int)(op1 / op2));
             else
                 printf("error: zero divisor\n");
             break;
