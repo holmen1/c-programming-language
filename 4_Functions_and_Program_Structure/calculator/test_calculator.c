@@ -93,4 +93,9 @@ void test_getch_ungetch() {
     ungetch('c'); /* Should print "ungetch: too many characters" */
     assert(getch() == 'b');
     printf("test_getch_ungetch buffer overflow passed\n");
+
+    /* Test EOF handling */
+    ungetch(EOF); /* Should not push EOF */
+    assert(getch() != EOF); /* Should not return EOF from buffer */
+    printf("test_getch_ungetch EOF handling passed\n");
 }
