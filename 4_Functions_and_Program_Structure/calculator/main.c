@@ -12,6 +12,7 @@ int main() {
     test_clear();
     test_operations();
     test_division_by_zero();
+    test_getch_ungetch();
     printf("All tests passed\n");
 
 

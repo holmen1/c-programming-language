@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 90)
 include_directories(4_Functions_and_Program_Structure/calculator)
 
 add_executable(c_programming_language
+    4_Functions_and_Program_Structure/calculator/test_calculator.c
     4_Functions_and_Program_Structure/calculator/getch.c
     4_Functions_and_Program_Structure/calculator/getop.c
     4_Functions_and_Program_Structure/calculator/stack.c

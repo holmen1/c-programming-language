@@ -81,3 +81,16 @@ void test_division_by_zero() {
     assert(result == 0.0); /* Should handle division by zero */
     printf("test_division_by_zero passed\n");
 }
+
+void test_getch_ungetch() {
+    /* Test getch and ungetch with 1-size buffer */
+    ungetch('a');
+    assert(getch() == 'a');
+    printf("test_getch_ungetch single character passed\n");
+
+    /* Test buffer overflow */
+    ungetch('b');
+    ungetch('c'); /* Should print "ungetch: too many characters" */
+    assert(getch() == 'b');
+    printf("test_getch_ungetch buffer overflow passed\n");
+}

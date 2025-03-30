@@ -17,3 +17,4 @@ void test_swap(void);
 void test_clear(void);
 void test_operations(void);
 void test_division_by_zero(void);
+void test_getch_ungetch();

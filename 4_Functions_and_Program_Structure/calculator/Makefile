@@ -1,5 +1,5 @@
 calculator: getch.o getop.o stack.o main.o
-	gcc -std=c90 -Wall -o calculator getch.o getop.o stack.o main.o -lm
+	gcc -std=c90 -Wall -o calculator getch.o getop.o stack.o main.o
 
 getch.o: getch.c
 	gcc -std=c90 -Wall -c getch.c -o getch.o
