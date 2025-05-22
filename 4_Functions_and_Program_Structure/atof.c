@@ -1,6 +1,6 @@
-// Exercise 4-2 handle scientific notation for single integer exponent
-// atof
-// convert string to double precision float
+/* Exercise 4-2 handle scientific notation for single integer exponent */
+/* atof */
+/* convert string to double precision float */
 #include <ctype.h>
 #include <stdio.h>
 #include <math.h>
@@ -40,6 +40,7 @@ int main()
     printf("atof(\"%s\") = %g\n", str, atof(str));
     char str2[] = "42.2e3";
     printf("atof(\"%s\") = %g\n", str2, atof(str2));
+    return 0;
 }
 
 /*
