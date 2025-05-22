@@ -44,6 +44,8 @@ int main()
 }
 
 /*
+gcc -std=c90 -Wall atof.c -lm
+
 atof("-42.2e-3") = -0.0422
 atof("42.2e3") = 42200
 */
