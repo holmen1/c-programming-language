@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "calc.h"
@@ -5,16 +6,6 @@
 #define MAXOP 100 /* maximum depth of operand or operator */
 
 int main() {
-    /* tests */
-    test_push_pop();
-    test_peek();
-    test_swap();
-    test_clear();
-    test_operations();
-    test_division_by_zero();
-    test_getch_ungetch();
-    printf("All tests passed\n");
-
 
     int type;
     double op1, op2;
@@ -50,6 +41,12 @@ int main() {
             else
                 printf("error: zero divisor\n");
             break;
+            case 's':
+                push(sin(pop()));
+            break;
+            case 'e':
+                push(exp(pop()));
+            break;
             case '\n':
                 printf("\t%.8g\n", pop());
             break;
@@ -62,5 +59,5 @@ int main() {
 }
 
 /*
-$ gcc -std=c90 -Wall -o calculator getch.c getop.c stack.c main.c
+$ gcc -std=c90 -Wall -o calculator getch.c getop.c stack.c main.c -lm
 */

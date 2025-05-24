@@ -81,7 +81,15 @@ void test_division_by_zero() {
     assert(result == 0.0); /* Should handle division by zero */
     printf("test_division_by_zero passed\n");
 }
-
+/*
+void test_math() {
+    getop("1.0 e s");
+    double result = pop();
+    printf("debug: %f\n", result);
+    assert(result > 0.410 && result < 0.411);
+    printf("test_math passed\n");
+}
+*/
 void test_getch_ungetch() {
     /* Test getch and ungetch with 1-size buffer */
     ungetch('a');
@@ -98,4 +106,18 @@ void test_getch_ungetch() {
     ungetch(EOF); /* Should not push EOF */
     assert(getch() != EOF); /* Should not return EOF from buffer */
     printf("test_getch_ungetch EOF handling passed\n");
+}
+
+
+int main(void) {
+    test_push_pop();
+    test_peek();
+    test_swap();
+    test_clear();
+    test_operations();
+    test_division_by_zero();
+/*    test_math();*/
+    test_getch_ungetch();
+    printf("All tests passed\n");
+    return 0;
 }
