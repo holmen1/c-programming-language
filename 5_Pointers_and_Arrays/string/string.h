@@ -1,0 +1,2 @@
+
+void strcat(char*, char*);
