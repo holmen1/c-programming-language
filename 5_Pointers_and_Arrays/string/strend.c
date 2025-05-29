@@ -1,18 +1,20 @@
 /* strend: returns 1 if t occurs at end of s, 0 otherwise */
 int strend(char* s, char* t)
 {
-	int n;
-	char* tt = t;
+    char *ss = s;
+    char *tt = t;
 
-	while (*tt)
-		tt++;
-	n = tt - t;
+    while (*ss) ss++;
+    while (*tt) tt++;
 
-	while (*s)
-		s++;
-        
-	for ( ; n > 0; n--)
-		if (*s-- != *tt--)
-			return 0;
-	return 1;
+    int len_s = ss - s;
+    int len_t = tt - t;
+
+    if (len_t > len_s)
+        return 0;
+
+    ss -= len_t;
+    while (*tt && *ss++ == *t++)
+        ;
+    return (*tt == '\0');
 }

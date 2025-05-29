@@ -11,6 +11,7 @@ main ()
 
     char end[] = "orld";
     printf("strend(fst, end) = %d\n", strend(fst, end));
+    printf("strend(snd, end) = %d\n", strend(snd, end));
 }
 
 /*
@@ -41,4 +42,6 @@ main.c:11:1: warning: control reaches end of non-void function [-Wreturn-type]
       | ^
 holmen1@hp ~/repos/c-programming-language/5_Pointers_and_Arrays/string master* $ ./a.out
 hello World
+strend(fst, end) = 1
+strend(snd, end) = 0
 */
