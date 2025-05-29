@@ -8,6 +8,9 @@ main ()
 
     strcat(fst, snd);
     printf("%s\n", fst);
+
+    char end[] = "orld";
+    printf("strend(fst, end) = %d\n", strend(fst, end));
 }
 
 /*
