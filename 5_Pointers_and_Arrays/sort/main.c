@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "string.h"
-#include "alloc.h"
+#include "readlines.h"
+#include "qsort.h"
 
 #define MAXLINES 5000
 
@@ -8,13 +8,14 @@ char* lineptr[MAXLINES];
 
 int main()
 {
-  /* int nlines; */
-  lineptr[0] = alloc(10);
-  lineptr[1] = alloc(10);
-  getline(lineptr[0], 10);
-  copy(lineptr[1], lineptr[0]);
-  printf("%s\n", lineptr[0]);
-  printf("%s\n", lineptr[1]);
+  int nlines;
 
-  return 0;
+  if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
+    qsort(lineptr, 0, nlines-1);
+    writelines(lineptr, nlines);
+    return 0;
+  } else {
+    printf("error: input too big to sort\n");
+    return 1;
+  }
 }
