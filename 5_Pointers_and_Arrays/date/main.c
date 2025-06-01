@@ -6,25 +6,31 @@ static char daytab[2][13] = {
 
 int day_of_year(int year, int month, int day)
 {
-    int i, leap;
-    
-    leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-    
-    for (i = 1; i < month; i++)
-        day += daytab[leap][i];
+    int leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+    char *p = *(daytab + leap);
+
+    while (--month > 0)
+        day += *(++p);
     return day;
 }
 
-
 void month_day(int year, int yearday, int *pmonth, int *pday)
 {
-    int i, leap;
+    int leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+    char *p = *(daytab + leap);
     
-    leap = (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-    
-    for (i = 1; yearday > daytab[leap][i]; i++)
-        yearday -= daytab[leap][i];
-    *pmonth = i;
+    *pmonth = 0;
+
+    while (1) {
+        *pmonth += 1;
+        p++;
+        
+        if (yearday > *p) { /* *p now holds the number of days in the current month (*pmonth) */
+            yearday -= *p;
+        } else {
+            break;
+        }
+    }
     *pday = yearday;
 }
 
@@ -39,7 +45,6 @@ int main()
     
     return 0;
 }
-
 
 /*
 day_of_year(2025, 3, 1) = 60
