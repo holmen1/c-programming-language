@@ -1,3 +1,3 @@
-void qsort(char* v[], int, int);
-void swap(char* v[], int, int);
+void qsort(char* v[], int left, int right);
+void swap(char* v[], int i, int j);
 
