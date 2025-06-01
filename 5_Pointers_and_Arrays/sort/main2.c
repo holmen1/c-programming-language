@@ -1,20 +1,23 @@
 #include <stdio.h>
 #include <time.h>
-#include "readlines.h"
+#include "readlines2.h"
 #include "qsort.h"
 
 #define MAXLINES 5000
+#define MAXSTOR 100000
 
 char* lineptr[MAXLINES];
 
 int main()
 {
   int nlines;
+  char linestorage[MAXSTOR];
+
   clock_t start_time, end_time;
   double read_time, sort_time;
 
   start_time = clock();
-  if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
+  if ((nlines = readlines2(lineptr, MAXLINES, linestorage, MAXSTOR)) >= 0) {
     end_time = clock();
     read_time = ((double) (end_time - start_time)) / CLOCKS_PER_SEC;
 
@@ -35,6 +38,6 @@ int main()
 }
 
 /*
-Time taken by readlines: 0.000780 seconds
-Time taken by qsort: 0.001340 seconds
+Time taken by readlines: 0.000744 seconds
+Time taken by qsort: 0.001277 seconds
 */
