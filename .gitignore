@@ -26,5 +26,5 @@
 cmake-build-debug/
 
 # IDE specific files
-.vscode/
+#.vscode/
 .idea/

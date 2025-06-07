@@ -1,0 +1,31 @@
+// filepath: .vscode/tasks.json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build sort2 project", // This is the label you'll use in launch.json
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-std=c90",
+                "-Wall",
+                "-g", // Crucial for debugging
+                "${workspaceFolder}/5_Pointers_and_Arrays/sort2/main.c",
+                "${workspaceFolder}/5_Pointers_and_Arrays/sort2/readlines.c",
+                "${workspaceFolder}/5_Pointers_and_Arrays/sort2/alloc.c", // Add if used by readlines
+                "${workspaceFolder}/5_Pointers_and_Arrays/sort2/numcmp.c",
+                "-o",
+                "${workspaceFolder}/5_Pointers_and_Arrays/sort2/a.out" // Output matches launch.json "program"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true // Optional: makes this the default build task (Ctrl+Shift+B)
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Compiles the sort2 project with all its C files."
+        }
+        // You can add other tasks here if needed
+    ]
+}

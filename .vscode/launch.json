@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch sort2",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/5_Pointers_and_Arrays/sort2/a.out", // Or your compiled program name e.g. sort2
+            "args": ["-n"], // Example: pass -n argument
+            // "args": [], // Or no arguments
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build sort2 project"
+        }
+    ]
+}
