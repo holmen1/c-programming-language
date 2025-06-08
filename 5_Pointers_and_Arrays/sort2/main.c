@@ -8,6 +8,7 @@ char *lineptr[MAXLINES];
 
 void qsort(void *lineptr[], int left, int right, int (*comp)(void *, void *));
 int numcmp(char *, char *);
+void reverse_lines(void *lines[], int num_lines);
 
 int main(int argc, char *argv[]) {
   int nlines;
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]) {
     qsort((void **)lineptr, 0, nlines - 1,
           (int (*)(void *, void *))(numeric ? (int (*)(void *, void *))numcmp
                                             : (int (*)(void *, void *))strcmp));
+    reverse_lines((void **)lineptr, nlines);
     writelines(lineptr, nlines);
     return 0;
   } else {
@@ -52,6 +54,14 @@ void swap(void *v[], int i, int j)
     tmp = v[i];
     v[i] = v[j];
     v[j] = tmp;
+}
+
+void reverse_lines(void *lines[], int num_lines)
+{
+    int i;
+    for (i = 0; i < num_lines / 2; i++) {
+        swap(lines, i, num_lines - 1 - i);
+    }
 }
 /*
 $ gcc -std=c90 -Wall main.c readlines.c alloc.c numcmp.c
