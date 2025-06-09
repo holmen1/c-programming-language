@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/5_Pointers_and_Arrays/sort2/a.out", // Or your compiled program name e.g. sort2
-            "args": ["-n"], // Example: pass -n argument
+            "args": ["-n", "-r"], // Example: pass -n argument
             // "args": [], // Or no arguments
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

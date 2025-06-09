@@ -11,16 +11,29 @@ int numcmp(char *, char *);
 void reverse_lines(void *lines[], int num_lines);
 
 int main(int argc, char *argv[]) {
-  int nlines;
-  int numeric = 0;
+  int nlines, c;
+  int numeric, reverse = 0;
 
-  if (argc > 1 && strcmp(argv[1], "-n") == 0)
-    numeric = 1;
+  while (--argc > 0 && **++argv == '-')
+    while ((c = *++(*argv)))
+      switch (c) {
+      case 'n':
+        numeric = 1;
+        break;
+      case 'r':
+        reverse = 1;
+        break;
+      default:
+        printf("Usage: sort [-n] [-r]\n");
+        return 1;
+      }
+
   if ((nlines = readlines(lineptr, MAXLINES)) >= 0) {
     qsort((void **)lineptr, 0, nlines - 1,
           (int (*)(void *, void *))(numeric ? (int (*)(void *, void *))numcmp
                                             : (int (*)(void *, void *))strcmp));
-    reverse_lines((void **)lineptr, nlines);
+    if (reverse)
+      reverse_lines((void **)lineptr, nlines);
     writelines(lineptr, nlines);
     return 0;
   } else {
