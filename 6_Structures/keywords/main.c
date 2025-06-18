@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "getword.h"
 
 struct key {
     char *word;
@@ -23,7 +24,6 @@ struct key {
 #define NKEYS (sizeof keytab / sizeof(struct key))
 #define MAXWORD 100
 
-int getword(char *, int);
 int binsearch(char *, struct key *, int);
 
 /* count C keywords */
@@ -61,3 +61,21 @@ int binsearch(char *word, struct key tab[], int n)
     }
     return -1;
 }
+
+/*
+$ gcc -std=c90 -Wall  main.c getword.c
+$ ./a.out <
+main.c
+   1 auto
+   1 break
+   1 case
+   5 char
+   1 const
+   1 continue
+   1 default
+   2 for
+   6 if
+   1 unsigned
+   2 void
+   3 while
+*/
