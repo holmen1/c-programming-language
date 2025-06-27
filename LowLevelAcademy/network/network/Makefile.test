@@ -1,0 +1,74 @@
+# Simple test for server-client functionality
+
+TARGET_SRV = bin/dbserver
+TARGET_CLI = bin/dbcli
+TEST_PORT = 9090
+TEST_DB = test.db
+
+.PHONY: test clean-test
+
+# Main test target
+test:
+	@echo "\n==== Testing Basic Server-Client Interaction ===="
+    
+	# Clean up any existing processes or files
+	@killall -9 $(TARGET_SRV) 2>/dev/null || true
+	@rm -f $(TEST_DB)
+    
+	# Start server in background
+	@echo "1. Starting server..."
+	@./$(TARGET_SRV) -f ./$(TEST_DB) -n -p $(TEST_PORT) > server.log 2>&1 & \
+	SERVER_PID=$$!; \
+	echo "   Server started with PID: $$SERVER_PID"; \
+	sleep 2; \
+    
+	# Add an employee
+	@echo "2. Adding employee with client..."
+	@./$(TARGET_CLI) -h 127.0.0.1 -p $(TEST_PORT) -a "Test Employee,123 Test St,40" > client.log 2>&1; \
+	if [ $$? -eq 0 ]; then \
+		echo "   ✅ Client successfully added employee"; \
+		sleep 2; \
+	else \
+		echo "   ❌ Client failed to add employee"; \
+		cat client.log; \
+		kill -9 $$SERVER_PID 2>/dev/null || true; \
+		exit 1; \
+	fi; \
+    
+	# Verify database file exists
+	@echo "3. Checking database file..."
+	@if [ -f $(TEST_DB) ]; then \
+		FILESIZE=$$(stat -c%s "$(TEST_DB)"); \
+		if [ $$FILESIZE -gt 100 ]; then \
+			echo "   ✅ Database file created successfully ($$FILESIZE bytes)"; \
+			echo "   File contents:"; \
+			xxd $(TEST_DB) | head -5; \
+		else \
+			echo "   ❌ Database file exists but is too small ($$FILESIZE bytes)"; \
+			xxd $(TEST_DB); \
+			cat server.log; \
+			exit 1; \
+		fi; \
+	else \
+		echo "   ❌ Database file not found"; \
+		cat server.log; \
+		exit 1; \
+	fi;
+    
+	# Clean shutdown
+	@echo "4. Shutting down server..."
+	@kill -TERM $$SERVER_PID; \
+	sleep 2; \
+	if ps -p $$SERVER_PID > /dev/null 2>&1; then \
+		echo "   ⚠️ Forcing server shutdown..."; \
+		kill -9 $$SERVER_PID 2>/dev/null || true; \
+	else \
+		echo "   ✅ Server shut down cleanly"; \
+	fi
+    
+	@echo "\n==== Test completed successfully! ===="
+
+# Clean up test artifacts
+clean-test:
+	@rm -f $(TEST_DB) server.log client.log
+	@killall -9 $(TARGET_SRV) 2>/dev/null || true

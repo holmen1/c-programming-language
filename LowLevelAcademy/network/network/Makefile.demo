@@ -1,0 +1,55 @@
+# Compact demo to showcase database functionality
+
+TARGET_SRV = bin/dbserver
+TARGET_CLI = bin/dbcli
+DEMO_PORT = 8080
+DEMO_DB = demo.db
+
+.PHONY: demo demo-clean demo-setup demo-operations
+
+# Main demo target
+demo: demo-clean demo-setup demo-operations
+	@echo "\n🎉 Demo completed! Database functionality showcased successfully."
+
+# Setup: start server and create database
+demo-setup:
+	@echo "\n📦 EMPLOYEE DATABASE DEMO"
+	@echo "=========================="
+	@echo "🚀 Starting database server on port $(DEMO_PORT)..."
+	@./$(TARGET_SRV) -f $(DEMO_DB) -n -p $(DEMO_PORT) > /dev/null 2>&1 & \
+	echo $$! > server.pid; \
+	sleep 2; \
+	echo "✅ Server running (PID: $$(cat server.pid))"
+
+# Demonstrate all operations
+demo-operations:
+	@echo "\n👥 Adding employees..."
+	@./$(TARGET_CLI) -h 127.0.0.1 -p $(DEMO_PORT) -a "Alice Johnson,123 Main St,40"
+	@./$(TARGET_CLI) -h 127.0.0.1 -p $(DEMO_PORT) -a "Bob Smith,456 Oak Ave,35"
+	@./$(TARGET_CLI) -h 127.0.0.1 -p $(DEMO_PORT) -a "Carol Davis,789 Pine Rd,42"
+	
+	@echo "\n📋 Listing all employees:"
+	@./$(TARGET_CLI) -h 127.0.0.1 -p $(DEMO_PORT) -l
+	
+	@echo "\n🗑️  Deleting an employee:"
+	@./$(TARGET_CLI) -h 127.0.0.1 -p $(DEMO_PORT) -d "Bob Smith"
+	
+	@echo "\n📋 Final employee list:"
+	@./$(TARGET_CLI) -h 127.0.0.1 -p $(DEMO_PORT) -l
+	
+	@echo "\n📊 Database file info:"
+	@ls -lh $(DEMO_DB) | awk '{print "   Size: " $$5 "   File: " $$9}'
+	
+	@echo "\n🛑 Shutting down server..."
+	@if [ -f server.pid ]; then \
+		kill -TERM $$(cat server.pid) 2>/dev/null; \
+		sleep 1; \
+		rm -f server.pid; \
+	fi
+
+# Clean up demo artifacts
+demo-clean:
+	@echo "🧹 Cleaning up previous demo..."
+	@rm -f $(DEMO_DB) server.pid server.log
+	@killall -9 $(TARGET_SRV) 2>/dev/null || true
+	@sleep 1
