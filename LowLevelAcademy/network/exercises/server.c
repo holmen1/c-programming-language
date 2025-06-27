@@ -9,6 +9,29 @@
 #define PORT 5555
 #define BACKLOG 5
 
+typedef enum {
+	PROTO_HELLO,
+} proto_type_e;
+
+typedef struct {
+	proto_type_e type;
+	unsigned int len;
+} proto_hdr_t;
+
+void handle_client(int fd) {
+	char buf[4096] = {0};
+	proto_hdr_t *hdr = (proto_hdr_t*)buf;
+
+	hdr->type = htonl(PROTO_HELLO); /* pack the type */
+	hdr->len = sizeof(int);
+	int reallen = hdr->len;
+	hdr->len = htons(hdr->len); /* pack the len */
+
+	int *data = (int*)&hdr[1];
+	*data = htonl(1); /* protocol version one, packed */
+	write(fd, hdr, sizeof(proto_hdr_t) + reallen);
+}
+
 int main(void) {
     struct sockaddr_in serverInfo = {0};
     struct sockaddr_in clientInfo = {0};
@@ -38,14 +61,16 @@ int main(void) {
         return 0;
     }
 
-    /* Accept */
-    int cfd = accept(fd, (struct sockaddr *)&clientInfo, &clientInfoLen);
-    if (cfd == -1) {
-      perror("accept");
-      close(fd);
-      return 0;
-    }
+    while (1) {
+      int cfd = accept(fd, (struct sockaddr*)&clientInfo, &clientInfoLen);
+      if (cfd == -1) {
+        perror("accept");
+        close(fd);
+        return 0;
+      }
+      
+      handle_client(cfd);
 
-    close(fd);
-    return 0;
+      close(cfd);
+    }
 }
