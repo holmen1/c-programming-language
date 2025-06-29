@@ -23,6 +23,9 @@
 *.bak
 *.old
 
+# Ignore all bin directory contents
+**/bin/*
+
 cmake-build-debug/
 
 # IDE specific files
