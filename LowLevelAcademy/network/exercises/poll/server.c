@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <sys/select.h>
+#include <poll.h>
 #include <netinet/in.h>
 
 #define PORT 5555
@@ -14,8 +14,9 @@
 
 int main(void) {
     int server_fd, client_fds[MAX_CLIENTS];
-    fd_set read_fds, master_fds;
-    int max_fd, activity, i, new_socket, bytes_read;
+    struct pollfd fds[MAX_CLIENTS + 1];  /* +1 for server socket */
+    int nfds = 1;  /* Number of file descriptors to monitor (start with server) */
+    int activity, i, new_socket, bytes_read;
     char buffer[BUFFER_SIZE];
     struct sockaddr_in server_addr, client_addr;
     socklen_t addr_len = sizeof(client_addr);
@@ -59,17 +60,19 @@ int main(void) {
     
     printf("Server started on port %d. Connect with: nc localhost %d\n", PORT, PORT);
     
-    /* Initialize the file descriptor sets */
-    FD_ZERO(&master_fds);
-    FD_SET(server_fd, &master_fds);
-    max_fd = server_fd;
+    /* Initialize the pollfd array with server socket */
+    fds[0].fd = server_fd;
+    fds[0].events = POLLIN;  /* Interested in read events */
+
+    /* Initialize remaining slots as unused */
+    for (i = 1; i <= MAX_CLIENTS; i++) {
+        fds[i].fd = -1;
+    }
     
     while (1) {
-        /* Copy the master set to the read set (select modifies the set) */
-        read_fds = master_fds;
         
         printf("Waiting for activity...\n");
-        activity = select(max_fd + 1, &read_fds, NULL, NULL, NULL);
+        activity = poll(fds, nfds, -1);  /* -1 means wait indefinitely */
         
         if (activity < 0) {
             perror("select");
@@ -77,7 +80,7 @@ int main(void) {
         }
         
         /* Check if there's activity on the server socket (new connection) */
-        if (FD_ISSET(server_fd, &read_fds)) {
+        if (fds[0].revents & POLLIN) {
             if ((new_socket = accept(server_fd, (struct sockaddr *)&client_addr, &addr_len)) < 0) {
                 perror("accept");
                 continue;
@@ -100,10 +103,11 @@ int main(void) {
                 printf("Too many clients, connection rejected\n");
                 close(new_socket);
             } else {
-                /* Add to master set */
-                FD_SET(new_socket, &master_fds);
-                if (new_socket > max_fd) {
-                    max_fd = new_socket;
+                /* Add to poll set */
+                fds[i+1].fd = new_socket;
+                fds[i+1].events = POLLIN;
+                if (i+1 >= nfds) {
+                    nfds = i+2;  /* Update the number of fds to monitor */
                 }
                 
                 /* Welcome message */
@@ -113,32 +117,51 @@ int main(void) {
         }
         
         /* Check for activity on client sockets */
-        for (i = 0; i < MAX_CLIENTS; i++) {
-            if (client_fds[i] != -1 && FD_ISSET(client_fds[i], &read_fds)) {
+        for (i = 1; i < nfds; i++) {
+            if (fds[i].fd != -1 && (fds[i].revents & POLLIN)) {
                 /* Data available from client */
-                bytes_read = read(client_fds[i], buffer, BUFFER_SIZE - 1);
+                bytes_read = read(fds[i].fd, buffer, BUFFER_SIZE - 1);
                 
                 if (bytes_read <= 0) {
                     /* Connection closed or error */
                     if (bytes_read == 0) {
-                        printf("Client on fd %d disconnected\n", client_fds[i]);
+                        printf("Client on fd %d disconnected\n", fds[i].fd);
                     } else {
                         perror("read");
                     }
                     
-                    /* Close socket and remove from set */
-                    close(client_fds[i]);
-                    FD_CLR(client_fds[i], &master_fds);
-                    client_fds[i] = -1;
+                    /* Close socket and remove from poll set */
+                    close(fds[i].fd);
+                    
+                    /* Find and clear the corresponding client_fds entry */
+                    int j = 0;
+                    for (; j < MAX_CLIENTS; j++) {
+                        if (client_fds[j] == fds[i].fd) {
+                            client_fds[j] = -1;
+                            break;
+                        }
+                    }
+                    
+                    /* Mark the pollfd slot as unused */
+                    fds[i].fd = -1;
+                    
+                    /* Compact the array if this was the last entry */
+                    if (i == nfds - 1) {
+                        nfds--;
+                        /* Find new last valid entry */
+                        while (nfds > 1 && fds[nfds-1].fd == -1) {
+                            nfds--;
+                        }
+                    }
                 } else {
                     /* Echo back the message */
                     buffer[bytes_read] = '\0';
-                    printf("Received from fd %d: %s", client_fds[i], buffer);
+                    printf("Received from fd %d: %s", fds[i].fd, buffer);
                     
                     /* Add a prefix to show it's coming back from the server */
                     char response[BUFFER_SIZE + 32];
                     sprintf(response, "Server echoes: %s", buffer);
-                    send(client_fds[i], response, strlen(response), 0);
+                    send(fds[i].fd, response, strlen(response), 0);
                 }
             }
         }
