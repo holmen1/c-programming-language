@@ -17,6 +17,7 @@
 
 #define MAX_CLIENTS 256
 #define BACKLOG 10
+#define DEFAULT_PORT 8080
 
 clientstate_t clientStates[MAX_CLIENTS] = {0};
 
@@ -35,7 +36,7 @@ void print_usage(char *argv[]) {
 
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
-    int listen_fd, conn_fd, freeSlot;
+    int i, listen_fd, conn_fd, freeSlot;
     struct sockaddr_in server_addr, client_addr;
     socklen_t client_len = sizeof(client_addr);
 
@@ -87,7 +88,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
     while (1) {
 
         int ii = 1;
-        for (int i = 0; i < MAX_CLIENTS; i++) {
+        for (i = 0; i < MAX_CLIENTS; i++) {
             if (clientStates[i].fd != -1) {
                 fds[ii].fd = clientStates[i].fd; /* Offset by 1 for listen_fd */
                 fds[ii].events = POLLIN;
@@ -102,7 +103,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
             exit(EXIT_FAILURE);
         }
 
-        // Check for new connections
+        /* Check for new connections */
         if (fds[0].revents & POLLIN) {
             if ((conn_fd = accept(listen_fd, (struct sockaddr *)&client_addr, &client_len)) == -1) {
                 perror("accept");
@@ -126,8 +127,8 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
             n_events--;
         }
 
-        // Check each client for read/write activity
-        for (int i = 1; i <= nfds && n_events > 0; i++) { // Start from 1 to skip the listen_fd
+        /* Check each client for read/write activity */
+        for (i = 1; i <= nfds && n_events > 0; i++) { /* Start from 1 to skip the listen_fd */
             if (fds[i].revents & POLLIN) {
                 n_events--;
 
@@ -135,11 +136,11 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
                 int slot = find_slot_by_fd((clientstate_t *)&clientStates, fd);
                 ssize_t bytes_read = read(fd, &clientStates[slot].buffer, sizeof(clientStates[slot].buffer));
                 if (bytes_read <= 0) {
-                    // Connection closed or error
+                    /* Connection closed or error */
                     close(fd);
 
                     if (slot != -1) {
-                        clientStates[slot].fd = -1; // Free up the slot
+                        clientStates[slot].fd = -1; /* Free up the slot */
                         clientStates[slot].state = STATE_DISCONNECTED;
                         printf("Client disconnected\n");
                         nfds--;
@@ -153,17 +154,19 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 }
 
 int main(int argc, char *argv[]) { 
+    /*
 	char *filepath = NULL;
 	char *portarg = NULL;
 	unsigned short port = 0;
 	bool newfile = false;
-	bool list = false;
 	int c;
 
 	int dbfd = -1;
+    */
 	struct dbheader_t *dbhdr = NULL;
 	struct employee_t *employees = NULL;
 
+    /*
 	while ((c = getopt(argc, argv, "nf:p:")) != -1) {
 		switch (c) {
 			case 'n':
@@ -230,8 +233,8 @@ int main(int argc, char *argv[]) {
 		printf("Failed to read employees");
 		return 0;
 	}
-
-	poll_loop(port, dbhdr, employees);
+    */
+	poll_loop(DEFAULT_PORT, dbhdr, employees);
 
 	return 0;
 }

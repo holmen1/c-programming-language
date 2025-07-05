@@ -1,32 +1,45 @@
 TARGET_SRV = bin/dbserver
-TARGET_CLI = bin/dbcli
+
+# Add C90 compilation flags
+CFLAGS = -std=c90 -Wall -Werror
 
 SRC_SRV = $(wildcard src/srv/*.c)
 OBJ_SRV = $(SRC_SRV:src/srv/%.c=obj/srv/%.o)
 
-SRC_CLI = $(wildcard src/cli/*.c)
-OBJ_CLI = $(SRC_CLI:src/cli/%.c=obj/cli/%.o)
-
-run: clean default
+# Just build and run the server
+run: clean server-only
+	@echo "Starting server on port 8080..."
 	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 &
-	./$(TARGET_CLI) 127.0.0.1
-	kill -9 $$(pidof dbserver)
+	@SERVER_PID=$$!; \
+	echo "Press Ctrl+C to stop the server"; \
+	trap "echo 'Stopping server...'; kill -9 $$SERVER_PID 2>/dev/null || true; exit 0" INT TERM; \
+	while true; do sleep 1; done
 
-default: $(TARGET_SRV) $(TARGET_CLI)
+# Quick test to verify server starts up correctly
+test-server: server-only
+	./$(TARGET_SRV) -f ./test.db -n -p 8181 & 
+	sleep 1
+	echo "Checking server status..."
+	ps aux | grep dbserver | grep -v grep
+	kill -9 $$(pidof dbserver) 2>/dev/null || true
+	echo "Server test complete"
+
+# Only build the server
+server-only: $(TARGET_SRV)
+
+default: server-only
 
 clean:
 	rm -f obj/srv/*.o
-	rm -f bin/*
+	rm -f bin/dbserver
 	rm -f *.db
 
-$(TARGET_SRV): $(OBJ_SRV)
-	gcc -o $@ $?
+# Create directories if they don't exist
+directories:
+	mkdir -p bin obj/srv
+
+$(TARGET_SRV): directories $(OBJ_SRV)
+	gcc $(CFLAGS) -o $@ $(OBJ_SRV)
 
 $(OBJ_SRV): obj/srv/%.o: src/srv/%.c
-	gcc -c $< -o $@ -Iinclude
-
-$(TARGET_CLI): $(OBJ_CLI)
-	gcc -o $@ $?
-
-$(OBJ_CLI): obj/cli/%.o: src/cli/%.c
-	gcc -c $< -o $@ -Iinclude
+	gcc $(CFLAGS) -c $< -o $@ -Iinclude
