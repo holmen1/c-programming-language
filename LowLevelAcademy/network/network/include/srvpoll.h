@@ -1,6 +1,7 @@
 #ifndef SRVPOLL_H
 #define SRVPOLL_H
 #include <poll.h>
+#include "parse.h"
 
 
 #define MAX_CLIENTS 256
@@ -20,10 +21,6 @@ typedef struct {
     char buffer[BUFF_SIZE]; /* Buffer for incoming data */
 } clientstate_t;
 
-void init_clients(clientstate_t *states);
-int find_free_slot(clientstate_t *states);
-int find_slot_by_fd(clientstate_t *states, int fd);
-/*static int setup_server_socket(unsigned short port);*/
-int setup_server_socket(unsigned short port);
+void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees);
 
 #endif /* SRVPOLL_H */

@@ -13,9 +13,10 @@ run: clean server-only
 	@echo "Starting server on port 8080..."
 	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 &
 	@SERVER_PID=$$!; \
+	echo "Server running with PID: $$SERVER_PID"; \
 	echo "Press Ctrl+C to stop the server"; \
-	trap "echo 'Stopping server...'; kill -9 $$SERVER_PID 2>/dev/null || true; exit 0" INT TERM; \
-	while true; do sleep 1; done
+	trap "echo 'Stopping server...'; kill -15 $$SERVER_PID; sleep 1; killall -9 dbserver 2>/dev/null || true; exit 0" INT TERM; \
+	while kill -0 $$SERVER_PID 2>/dev/null; do sleep 1; done
 
 # Quick test to verify server starts up correctly
 test-server: server-only
