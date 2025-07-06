@@ -4,8 +4,8 @@
 
 
 #define MAX_CLIENTS 256
-#define PORT 8080
 #define BUFF_SIZE 4096
+#define BACKLOG 10 /* Maximum number of pending connections in the queue */
 
 typedef enum {
     STATE_NEW,
@@ -23,5 +23,7 @@ typedef struct {
 void init_clients(clientstate_t *states);
 int find_free_slot(clientstate_t *states);
 int find_slot_by_fd(clientstate_t *states, int fd);
+/*static int setup_server_socket(unsigned short port);*/
+int setup_server_socket(unsigned short port);
 
 #endif /* SRVPOLL_H */

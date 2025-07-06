@@ -16,7 +16,6 @@
 
 
 #define MAX_CLIENTS 256
-#define BACKLOG 10
 
 clientstate_t clientStates[MAX_CLIENTS] = {0};
 
@@ -44,45 +43,15 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
     int opt = 1;  /* Option for setsockopt */
 
     /* Initialize client states */
-    init_clients((clientstate_t *)&clientStates);
+    init_clients(clientStates);
 
-    /* Create server socket */
-    if ((listen_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("socket");
-        exit(EXIT_FAILURE);
-    }
-
-    if (setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
-
-    /* Prepare server address structure */
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY;  /* Accept connections from any IP */
-    server_addr.sin_port = htons(port);  /* Convert port number to network byte order */
-
-    /* Bind socket to port */
-    if (bind(listen_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
-        perror("bind");
-        close(listen_fd);
-        exit(EXIT_FAILURE);
-    }
-
-    /* Listen for incoming connections */
-    if (listen(listen_fd, BACKLOG) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
-    
+    listen_fd = setup_server_socket(port);
     printf("Server started on port %d. Connect with: nc localhost %d\n", port, port);
 
     /* Initialize the pollfd array with server socket */
     memset(fds, 0, sizeof(fds));  /* Clear the pollfd array */
     fds[0].fd = listen_fd;
     fds[0].events = POLLIN;  /* Interested in read events */
-    nfds = 1;
 
     while (1) {
 
@@ -94,12 +63,18 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
                 poll_index++;
             }   
         }
+        nfds = poll_index; /* Set nfds to exactly match the number of valid entries */
 
         /* Wait for an event on one of the sockets */
-        int n_events = poll(fds, nfds, -1); /* -1 means no timeout */
-        if (n_events == -1) {
+        int n_events = poll(fds, nfds, 30000); /* 30 s timeout */
+        if (n_events < 0) {
             perror("poll");
             exit(EXIT_FAILURE);
+        }
+        if (n_events == 0) {
+            /* Timeout occurred - no activity for 30 seconds */
+            printf("Poll timeout - no activity\n");
+            continue; /* Skip this iteration and go back to polling */
         }
 
         /* Check for new connections */
@@ -112,14 +87,13 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
             printf("New connection from %s:%d\n",
             	inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
-            freeSlot = find_free_slot((clientstate_t *)&clientStates);
+            freeSlot = find_free_slot(clientStates);
             if (freeSlot == -1) {
                 printf("Server full: closing new connection\n");
                 close(conn_fd);
             } else {
                 clientStates[freeSlot].fd = conn_fd;
                 clientStates[freeSlot].state = STATE_CONNECTED;
-                nfds++;
                 printf("Slot %d has fd %d\n", freeSlot, clientStates[freeSlot].fd);
             }
 
@@ -132,8 +106,10 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
                 n_events--;
 
                 int fd = fds[i].fd;
-                int slot = find_slot_by_fd((clientstate_t *)&clientStates, fd);
-                ssize_t bytes_read = read(fd, &clientStates[slot].buffer, sizeof(clientStates[slot].buffer));
+                int slot = find_slot_by_fd(clientStates, fd);
+                ssize_t bytes_read = read(fd, clientStates[slot].buffer, sizeof(clientStates[slot].buffer) - 1);
+                if (bytes_read > 0)
+                    clientStates[slot].buffer[bytes_read] = '\0';  /* Null-terminate */
                 if (bytes_read <= 0) {
                     /* Connection closed or error */
                     close(fd);
@@ -142,7 +118,6 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
                         clientStates[slot].fd = -1; /* Free up the slot */
                         clientStates[slot].state = STATE_DISCONNECTED;
                         printf("Client disconnected\n");
-                        nfds--;
                     }
                 } else {
                     printf("TODO\n");
