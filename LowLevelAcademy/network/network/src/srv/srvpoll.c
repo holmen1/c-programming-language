@@ -180,12 +180,12 @@ static void handle_signal(int sig) {
 }
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
-    signal(SIGINT, handle_signal);
-    signal(SIGTERM, handle_signal);
     int i, listen_fd;
     int n_events;
     int nfds;
     struct pollfd fds[MAX_CLIENTS + 1];
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
     
     /* Initialize client states */
     init_clients(clientStates);
@@ -195,7 +195,6 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
     printf("Server started on port %d. Connect with: nc localhost %d\n", port, port);
     
     while (keep_running) {
-        /* Prepare poll fds for this iteration */
         prepare_poll_fds(fds, listen_fd, &nfds);
         
         /* Wait for events */
@@ -211,7 +210,6 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
             continue;
         }
         
-        /* Handle new connections */
         if (fds[0].revents & POLLIN) {
             handle_new_connection(listen_fd);
             n_events--;
@@ -224,8 +222,13 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
                 n_events--;
             }
         }
+
+        if (!keep_running) {
+            printf("Shutting down server...\n");
+            break;
+        }
     }
     
-    /* Clean up */
+    printf("Closing server socket...\n");
     close(listen_fd);
 }
