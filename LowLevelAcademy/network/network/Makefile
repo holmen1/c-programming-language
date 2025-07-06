@@ -34,6 +34,9 @@ test-server: server-only
 	kill -9 $$(pidof dbserver) 2>/dev/null || true; \
 	echo "Server test complete"
 
+debug: CFLAGS += -g -O0
+debug: clean server-only
+
 # Only build the server
 server-only: $(TARGET_SRV)
 
