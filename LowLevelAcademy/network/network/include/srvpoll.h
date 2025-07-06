@@ -15,8 +15,8 @@ typedef enum {
 
 /* Structure to hold client state */
 typedef struct {
-    int fd;                /* File descriptor for the client socket */
-    state_e state;        /* Current state of the client */
+    int fd;                 /* File descriptor for the client socket */
+    state_e state;          /* Current state of the client */
     char buffer[BUFF_SIZE]; /* Buffer for incoming data */
 } clientstate_t;
 

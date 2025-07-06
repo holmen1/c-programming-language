@@ -17,7 +17,6 @@
 
 #define MAX_CLIENTS 256
 #define BACKLOG 10
-#define DEFAULT_PORT 8080
 
 clientstate_t clientStates[MAX_CLIENTS] = {0};
 
@@ -77,7 +76,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
         exit(EXIT_FAILURE);
     }
     
-    printf("Server started on port %d. Connect with: nc localhost %d\n", PORT, PORT);
+    printf("Server started on port %d. Connect with: nc localhost %d\n", port, port);
 
     /* Initialize the pollfd array with server socket */
     memset(fds, 0, sizeof(fds));  /* Clear the pollfd array */
@@ -87,12 +86,12 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 
     while (1) {
 
-        int ii = 1;
+        int poll_index = 1; /* Start at 1 for listen_fd */
         for (i = 0; i < MAX_CLIENTS; i++) {
             if (clientStates[i].fd != -1) {
-                fds[ii].fd = clientStates[i].fd; /* Offset by 1 for listen_fd */
-                fds[ii].events = POLLIN;
-                ii++;
+                fds[poll_index].fd = clientStates[i].fd;
+                fds[poll_index].events = POLLIN;
+                poll_index++;
             }   
         }
 
@@ -154,19 +153,19 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 }
 
 int main(int argc, char *argv[]) { 
-    /*
 	char *filepath = NULL;
 	char *portarg = NULL;
 	unsigned short port = 0;
 	bool newfile = false;
 	int c;
-
+    /*
+    // Uncomment this section if you want to use file descriptors directly
 	int dbfd = -1;
     */
 	struct dbheader_t *dbhdr = NULL;
 	struct employee_t *employees = NULL;
 
-    /*
+    
 	while ((c = getopt(argc, argv, "nf:p:")) != -1) {
 		switch (c) {
 			case 'n':
@@ -202,7 +201,7 @@ int main(int argc, char *argv[]) {
 		print_usage(argv);
 		return 0;
 	}
-
+/*
 
 	if (newfile) {
 		dbfd = create_db_file(filepath);
@@ -234,7 +233,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
     */
-	poll_loop(DEFAULT_PORT, dbhdr, employees);
+	poll_loop(port, dbhdr, employees);
 
 	return 0;
 }

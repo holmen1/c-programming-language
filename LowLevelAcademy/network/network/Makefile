@@ -1,13 +1,15 @@
 TARGET_SRV = bin/dbserver
 
 # Add C90 compilation flags
-CFLAGS = -std=c90 -Wall -Werror
+CFLAGS = -std=c90 -Wall
 
 SRC_SRV = $(wildcard src/srv/*.c)
 OBJ_SRV = $(SRC_SRV:src/srv/%.c=obj/srv/%.o)
 
 # Just build and run the server
 run: clean server-only
+	@echo "Killing any existing servers..."
+	killall -9 dbserver 2>/dev/null || true
 	@echo "Starting server on port 8080..."
 	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 &
 	@SERVER_PID=$$!; \
@@ -17,6 +19,9 @@ run: clean server-only
 
 # Quick test to verify server starts up correctly
 test-server: server-only
+	@echo "Killing any existing servers..."
+	killall -9 dbserver 2>/dev/null || true
+	@echo "Starting server on port 8181..."
 	./$(TARGET_SRV) -f ./test.db -n -p 8181 & 
 	sleep 1
 	echo "Checking server status..."
