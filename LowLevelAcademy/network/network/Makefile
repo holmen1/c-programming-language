@@ -9,10 +9,6 @@ OBJ_SRV = $(SRC_SRV:src/srv/%.c=obj/srv/%.o)
 SRC_CLI = $(wildcard src/cli/*.c)
 OBJ_CLI = $(SRC_CLI:src/cli/%.c=obj/cli/%.o)
 
-# Extract database-related files from server source
-SRC_DB = src/srv/file.c src/srv/parse.c
-OBJ_DB = $(SRC_DB:src/srv/%.c=obj/srv/%.o)
-
 .PHONY: default clean server-only run test-server debug directories cleanup
 
 default: $(TARGET_SRV) $(TARGET_CLI)
@@ -26,8 +22,8 @@ $(TARGET_SRV): $(OBJ_SRV)
 $(OBJ_SRV): obj/srv/%.o: src/srv/%.c
 	gcc $(CFLAGS) -c $< -o $@ -Iinclude
 
-$(TARGET_CLI): $(OBJ_CLI) $(OBJ_DB)
-	gcc $(CFLAGS) -o $@ $(OBJ_CLI) $(OBJ_DB)
+$(TARGET_CLI): $(OBJ_CLI)
+	gcc $(CFLAGS) -o $@ $(OBJ_CLI)
 
 $(OBJ_CLI): obj/cli/%.o: src/cli/%.c
 	gcc $(CFLAGS) -c $< -o $@ -Iinclude
@@ -59,37 +55,6 @@ run-server: clean server-only
 	echo "Press Ctrl+C to stop the server"; \
 	trap "echo 'Stopping server...'; kill -TERM $$SERVER_PID; sleep 2; kill -9 $$SERVER_PID 2>/dev/null || true; exit 0" INT TERM; \
 	while kill -0 $$SERVER_PID 2>/dev/null; do sleep 1; done
-
-# Just build everything without running client
-build-all: clean default
-	@echo "Server and client successfully built"
-	@echo "Server binary: $(TARGET_SRV)"
-	@echo "Client binary: $(TARGET_CLI)"
-	@echo "Database files included in client: $(SRC_DB)"
-
-# Run server only (existing target remains unchanged)
-run-server: clean server-only
-	@echo "Starting server on port 8080..."
-	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 & \
-	SERVER_PID=$$!; \
-	echo "Server running with PID: $$SERVER_PID"; \
-	echo "Press Ctrl+C to stop the server"; \
-	trap "echo 'Stopping server...'; kill -TERM $$SERVER_PID; sleep 2; kill -9 $$SERVER_PID 2>/dev/null || true; exit 0" INT TERM; \
-	while kill -0 $$SERVER_PID 2>/dev/null; do sleep 1; done
-
-run: clean default
-	@echo "Starting server on port 8080..."
-	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 & \
-	SERVER_PID=$$!; \
-	echo "Server running with PID: $$SERVER_PID"; \
-	sleep 2; \
-	echo "Starting client..."; \
-	./$(TARGET_CLI)  -f ./mynewdb.db -l; \
-	CLIENT_STATUS=$$?; \
-	echo "Client finished with status $$CLIENT_STATUS, stopping server..."; \
-	kill -TERM $$SERVER_PID; \
-	sleep 1; \
-	exit $$CLIENT_STATUS
 
 
 # Updated help target to include the new build-all option

@@ -21,6 +21,7 @@ static void prepare_poll_fds(struct pollfd *fds, int listen_fd, int *nfds);
 static void handle_new_connection(int listen_fd);
 static void handle_client_data(int fd);
 static void handle_signal(int sig);
+static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *states);
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
     int i, listen_fd;
