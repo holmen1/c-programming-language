@@ -11,6 +11,9 @@
 *.out
 *.exe
 
+# Database files
+*.db
+
 # Debug files
 *.dSYM/
 *.dSYM/*

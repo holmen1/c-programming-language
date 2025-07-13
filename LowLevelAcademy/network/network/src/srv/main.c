@@ -31,10 +31,7 @@ int main(int argc, char *argv[]) {
 	unsigned short port = 0;
 	bool newfile = false;
 	int c;
-    /*
-    // Uncomment this section if you want to use file descriptors directly
 	int dbfd = -1;
-    */
 	struct dbheader_t *dbhdr = NULL;
 	struct employee_t *employees = NULL;
 
@@ -74,7 +71,6 @@ int main(int argc, char *argv[]) {
 		print_usage(argv);
 		return 0;
 	}
-/*
 
 	if (newfile) {
 		dbfd = create_db_file(filepath);
@@ -105,7 +101,7 @@ int main(int argc, char *argv[]) {
 		printf("Failed to read employees");
 		return 0;
 	}
-    */
+
 	poll_loop(port, dbhdr, employees);
 
 	return 0;
