@@ -56,6 +56,8 @@ run-server: clean server-only
 	trap "echo 'Stopping server...'; kill -TERM $$SERVER_PID; sleep 2; kill -9 $$SERVER_PID 2>/dev/null || true; exit 0" INT TERM; \
 	while kill -0 $$SERVER_PID 2>/dev/null; do sleep 1; done
 
+run: clean default
+	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 &
 
 # Updated help target to include the new build-all option
 help:
