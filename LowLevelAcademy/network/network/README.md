@@ -104,3 +104,42 @@ test-data:
 2. Run the test suite before committing changes
 3. Separate building from running for better control
 4. Use `.PHONY` for non-file targets in Makefiles
+
+
+$ make run-server
+Makefile:72: warning: overriding recipe for target 'run-server'
+Makefile:55: warning: ignoring old recipe for target 'run-server'
+Cleaning up any running servers...
+killall -9 dbserver 2>/dev/null || true
+rm -f obj/srv/*.o obj/cli/*.o
+rm -f bin/*
+rm -f *.db
+gcc -std=c90 -Wall -c src/srv/file.c -o obj/srv/file.o -Iinclude
+gcc -std=c90 -Wall -c src/srv/main.c -o obj/srv/main.o -Iinclude
+src/srv/main.c: In function ‘main’:
+src/srv/main.c:32:14: warning: variable ‘newfile’ set but not used [-Wunused-but-set-variable]
+   32 |         bool newfile = false;
+      |              ^~~~~~~
+gcc -std=c90 -Wall -c src/srv/parse.c -o obj/srv/parse.o -Iinclude
+src/srv/parse.c: In function ‘output_file’:
+src/srv/parse.c:155:5: warning: implicit declaration of function ‘ftruncate’; did you mean ‘strncat’? [-Wimplicit-function-declaration]
+  155 |     ftruncate(fd, sizeof(struct dbheader_t) + sizeof(struct employee_t) * realcount);
+      |     ^~~~~~~~~
+      |     strncat
+gcc -std=c90 -Wall -c src/srv/srvpoll.c -o obj/srv/srvpoll.o -Iinclude
+gcc -std=c90 -Wall -o bin/dbserver obj/srv/file.o obj/srv/main.o obj/srv/parse.o obj/srv/srvpoll.o
+Starting server on port 8080...
+./bin/dbserver -f ./mynewdb.db -n -p 8080 & \
+SERVER_PID=$!; \
+echo "Server running with PID: $SERVER_PID"; \
+echo "Press Ctrl+C to stop the server"; \
+trap "echo 'Stopping server...'; kill -TERM $SERVER_PID; sleep 2; kill -9 $SERVER_PID 2>/dev/null || true; exit 0" INT TERM; \
+while kill -0 $SERVER_PID 2>/dev/null; do sleep 1; done
+Server running with PID: 36326
+Press Ctrl+C to stop the server
+Server started on port 8080. Connect with: nc localhost 8080
+New connection from 127.0.0.1:54728
+Client connected in slot 0 with fd 4
+Received from client 0: hello
+
+Client in slot 0 disconnected

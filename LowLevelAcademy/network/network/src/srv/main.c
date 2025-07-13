@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "file.h"
+#include "parse.h"
 #include "srvpoll.h"
 
 
