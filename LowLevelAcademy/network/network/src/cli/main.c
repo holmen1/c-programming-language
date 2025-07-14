@@ -3,13 +3,14 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "common.h"
 
 void send_hello(int fd) {
     char buf[4096] = {0};
 
-	dbproto_hdr_t *hdr = buf;
+	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
 	hdr->type = MSG_HELLO_REQ;
 	hdr->len = 1;
 
