@@ -30,7 +30,7 @@ $(OBJ_CLI): obj/cli/%.o: src/cli/%.c
 
 # Debug build
 debug: CFLAGS += -g -O0
-debug: clean server-only
+debug: clean default
 
 # Directory creation
 directories:
