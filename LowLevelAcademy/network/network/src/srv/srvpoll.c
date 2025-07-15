@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "common.h"
 #include "srvpoll.h"
 #include "parse.h"
 
@@ -21,7 +22,7 @@ static void prepare_poll_fds(struct pollfd *fds, int listen_fd, int *nfds);
 static void handle_new_connection(int listen_fd);
 static void handle_client_data(int fd);
 static void handle_signal(int sig);
-static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *states);
+static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client);
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
     int i, listen_fd;
@@ -214,6 +215,34 @@ static void handle_client_data(int fd) {
         clientStates[slot].fd = -1;
         clientStates[slot].state = STATE_DISCONNECTED;
         printf("Client in slot %d disconnected\n", slot);
+    }
+}
+
+void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client) {
+    dbproto_hdr_t *hdr = (dbproto_hdr_t *)client->buffer;
+
+    hdr->type = ntohs(hdr->type);
+    hdr->len = ntohs(hdr->len);
+
+    if (client->state == STATE_HELLO) {
+        if (hdr->type != MSG_HELLO_REQ || hdr->len != 1) {
+            printf("Client %d sent unexpected message type %d in HELLO state\n", client->fd, hdr->type);
+            /* TODO: send error msg */
+        }
+
+        dbproto_hello_req *hello_req = (dbproto_hello_req *)&hdr[1];
+        hello_req->proto = ntohs(hello_req->proto);
+        if (hello_req->proto != PROTO_VER) {
+            printf("Client %d sent unsupported protocol version %d\n", client->fd, hello_req->proto);
+            /* TODO: send error msg */
+        }
+
+        /* TODO: send hello response */
+        client->state = STATE_MSG;  /* Move to MSG state */
+        printf("Client %d sent valid hello request, moving to MSG state\n", client->fd);
+    }
+
+    if (client->state == STATE_MSG) {
     }
 }
 
