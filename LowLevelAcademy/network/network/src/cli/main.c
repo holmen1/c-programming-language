@@ -23,6 +23,7 @@ int send_hello(int fd) {
 	hello_req->proto = htons(hello_req->proto);
 
 	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_req));
+	printf("Sent hello request to server. Protocol v1\n");
 	read(fd, buf, sizeof(buf));
 
 	hdr->type = ntohl(hdr->type);
@@ -32,8 +33,7 @@ int send_hello(int fd) {
 		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
 		return STATUS_ERROR;
 	}
-
-	printf("Sent hello request to server. Protocol v1\n");
+	printf("Received hello response from server. Protocol v%d\n", ntohs(hello_req->proto));
 	return STATUS_SUCCESS;
 }
 

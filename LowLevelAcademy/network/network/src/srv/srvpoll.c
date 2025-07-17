@@ -23,6 +23,8 @@ static void handle_new_connection(int listen_fd);
 static void handle_client_data(int fd);
 static void handle_signal(int sig);
 static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client);
+static void fsm_reply_hello_err(clientstate_t *client, dbproto_hdr_t *hdr);
+static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr);
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
     int i, listen_fd;
@@ -218,7 +220,7 @@ static void handle_client_data(int fd) {
     }
 }
 
-void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client) {
+static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client) {
     dbproto_hdr_t *hdr = (dbproto_hdr_t *)client->buffer;
 
     hdr->type = ntohs(hdr->type);
@@ -234,16 +236,33 @@ void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, c
         hello_req->proto = ntohs(hello_req->proto);
         if (hello_req->proto != PROTO_VER) {
             printf("Client %d sent unsupported protocol version %d\n", client->fd, hello_req->proto);
-            /* TODO: send error msg */
+            fsm_reply_hello_err(client, hdr);
+            return;
         }
 
-        /* TODO: send hello response */
+        fsm_reply_hello(client, hdr);
         client->state = STATE_MSG;  /* Move to MSG state */
         printf("Client %d sent valid hello request, moving to MSG state\n", client->fd);
     }
 
     if (client->state == STATE_MSG) {
     }
+}
+
+static void fsm_reply_hello_err(clientstate_t *client, dbproto_hdr_t *hdr) {
+    hdr->type = htonl(MSG_ERROR);
+    hdr->len = htons(0);
+
+    write(client->fd, hdr, sizeof(dbproto_hdr_t));
+}
+
+static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr) {
+    hdr->type = htonl(MSG_HELLO_RESP);
+    hdr->len = htons(1);
+    dbproto_hello_resp* hello = (dbproto_hello_req*)&hdr[1];
+    hello->proto = htons(PROTO_VER);
+
+    write(client->fd, hdr, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_resp));
 }
 
 static void handle_signal(int sig) {
