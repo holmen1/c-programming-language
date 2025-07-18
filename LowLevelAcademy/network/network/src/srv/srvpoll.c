@@ -15,11 +15,10 @@ clientstate_t clientStates[MAX_CLIENTS];
 static volatile int keep_running = 1;
 
 static void init_clients(clientstate_t *states);
-static int find_free_slot(clientstate_t *states);
-static int find_slot_by_fd(clientstate_t *states, int fd);
 static int setup_server_socket(unsigned short port);
 static void prepare_poll_fds(struct pollfd *fds, int listen_fd, int *nfds);
-static void handle_client_data(int fd);
+static int find_free_slot(clientstate_t *states);
+static int find_slot_by_fd(clientstate_t *states, int fd);
 static void handle_signal(int sig);
 static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client);
 static void fsm_reply_hello_err(clientstate_t *client, dbproto_hdr_t *hdr);
@@ -37,14 +36,16 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
     
-    /* Initialize client states */
     init_clients(clientStates);
     
-    /* Set up server socket */
     listen_fd = setup_server_socket(port);
     printf("Server started on port %d. Connect with: nc localhost %d\n", port, port);
     
     while (keep_running) {
+        /*
+        Set up the array of file descriptors to be monitored by the poll() system call
+        clears the entire array, then adds the server's listening socket at index 0,
+        followed by all active client connections */
         prepare_poll_fds(fds, listen_fd, &nfds);
         
         /* Wait for events */
@@ -59,7 +60,8 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
             printf("Poll timeout - no activity\n");
             continue;
         }
-        
+
+        /* Handle new connection */
         if (fds[0].revents & POLLIN) {
             if ((conn_fd = accept(listen_fd, (struct sockaddr *)&client_addr, &client_len)) == -1) {
                 perror("accept");
@@ -83,10 +85,26 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
         }
         
         /* Handle client activity */
-        for (i = 1; i < nfds && n_events > 0; i++) {
+        for (i = 1; i <= nfds && n_events > 0; i++) { /* Start from 1 to skip the listen_fd */
             if (fds[i].revents & POLLIN) {
-                handle_client_data(fds[i].fd);
                 n_events--;
+
+                int fd = fds[i].fd;
+                int slot = find_slot_by_fd(clientStates, fd);
+                ssize_t bytes_read = read(fd, &clientStates[slot].buffer, sizeof(clientStates[slot].buffer));
+                if (bytes_read <= 0) {
+                    /* Connection closed or error */
+                    close(fd);
+
+                    if (slot != -1) {
+                        clientStates[slot].fd = -1; /* Free up the slot */
+                        clientStates[slot].state = STATE_DISCONNECTED;
+                        printf("Client disconnected\n");
+                        nfds--;
+                    }
+                } else {
+                   handle_client_fsm(dbhdr, employees, &clientStates[slot]);
+                }
             }
         }
 
@@ -101,6 +119,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
 }
 
 
+
 static void init_clients(clientstate_t *states) {
     int i = 0;
     for (; i < MAX_CLIENTS; i++) {
@@ -108,26 +127,6 @@ static void init_clients(clientstate_t *states) {
         states[i].state = STATE_NEW;
         memset(states[i].buffer, '\0', BUFF_SIZE); /* Clear the buffer */
     }
-}
-
-static int find_free_slot(clientstate_t *states) {
-    int i = 0;
-    for (; i < MAX_CLIENTS; i++) {
-        if (states[i].fd == -1) {
-            return i; /* Return the index of the first free slot */
-        }
-    }
-    return -1; /* No free slot found */
-}
-
-static int find_slot_by_fd(clientstate_t *states, int fd) {
-    int i = 0;
-    for (; i < MAX_CLIENTS; i++) {
-        if (states[i].fd == fd) {
-            return i;
-        }
-    }
-    return -1; /* No slot found for the given file descriptor */
 }
 
 /* listen for incoming connections, return the file descriptor of the listening socket */
@@ -193,27 +192,24 @@ static void prepare_poll_fds(struct pollfd *fds, int listen_fd, int *nfds) {
     *nfds = poll_index;  /* Update nfds */
 }
 
-static void handle_client_data(int fd) {
-    int slot = find_slot_by_fd(clientStates, fd);
-    if (slot == -1) {
-        close(fd);  /* Unknown client - just close it */
-        return;
+static int find_free_slot(clientstate_t *states) {
+    int i = 0;
+    for (; i < MAX_CLIENTS; i++) {
+        if (states[i].fd == -1) {
+            return i; /* Return the index of the first free slot */
+        }
     }
-    
-    ssize_t bytes_read = read(fd, clientStates[slot].buffer, 
-                             sizeof(clientStates[slot].buffer) - 1);
-                             
-    if (bytes_read > 0) {
-        clientStates[slot].buffer[bytes_read] = '\0';  /* Null-terminate */
-        printf("Received from client %d: %s\n", slot, clientStates[slot].buffer);
-        /* TODO: Process commands here */
-    } else {
-        /* Connection closed or error */
-        close(fd);
-        clientStates[slot].fd = -1;
-        clientStates[slot].state = STATE_DISCONNECTED;
-        printf("Client in slot %d disconnected\n", slot);
+    return -1; /* No free slot found */
+}
+
+static int find_slot_by_fd(clientstate_t *states, int fd) {
+    int i = 0;
+    for (; i < MAX_CLIENTS; i++) {
+        if (states[i].fd == fd) {
+            return i;
+        }
     }
+    return -1; /* No slot found for the given file descriptor */
 }
 
 static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client) {
