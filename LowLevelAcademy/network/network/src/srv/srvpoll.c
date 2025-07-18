@@ -19,7 +19,6 @@ static int find_free_slot(clientstate_t *states);
 static int find_slot_by_fd(clientstate_t *states, int fd);
 static int setup_server_socket(unsigned short port);
 static void prepare_poll_fds(struct pollfd *fds, int listen_fd, int *nfds);
-static void handle_new_connection(int listen_fd);
 static void handle_client_data(int fd);
 static void handle_signal(int sig);
 static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client);
@@ -27,6 +26,10 @@ static void fsm_reply_hello_err(clientstate_t *client, dbproto_hdr_t *hdr);
 static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr);
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
+    int conn_fd, freeSlot;
+    struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
+
     int i, listen_fd;
     int n_events;
     int nfds;
@@ -58,7 +61,24 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
         }
         
         if (fds[0].revents & POLLIN) {
-            handle_new_connection(listen_fd);
+            if ((conn_fd = accept(listen_fd, (struct sockaddr *)&client_addr, &client_len)) == -1) {
+                perror("accept");
+                return;
+            }
+        
+            printf("New connection from %s:%d\n", 
+                   inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+        
+            freeSlot = find_free_slot(clientStates);
+            if (freeSlot == -1) {
+                printf("Server full: closing new connection\n");
+                close(conn_fd);
+            } else {
+                clientStates[freeSlot].fd = conn_fd;
+                clientStates[freeSlot].state = STATE_HELLO;
+                printf("Client connected in slot %d with fd %d\n", freeSlot, conn_fd);
+                nfds++;
+            }
             n_events--;
         }
         
@@ -171,30 +191,6 @@ static void prepare_poll_fds(struct pollfd *fds, int listen_fd, int *nfds) {
     }
     
     *nfds = poll_index;  /* Update nfds */
-}
-
-static void handle_new_connection(int listen_fd) {
-    int conn_fd, freeSlot;
-    struct sockaddr_in client_addr;
-    socklen_t client_len = sizeof(client_addr);
-    
-    if ((conn_fd = accept(listen_fd, (struct sockaddr *)&client_addr, &client_len)) == -1) {
-        perror("accept");
-        return;
-    }
-
-    printf("New connection from %s:%d\n", 
-           inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-
-    freeSlot = find_free_slot(clientStates);
-    if (freeSlot == -1) {
-        printf("Server full: closing new connection\n");
-        close(conn_fd);
-    } else {
-        clientStates[freeSlot].fd = conn_fd;
-        clientStates[freeSlot].state = STATE_CONNECTED;
-        printf("Client connected in slot %d with fd %d\n", freeSlot, conn_fd);
-    }
 }
 
 static void handle_client_data(int fd) {
