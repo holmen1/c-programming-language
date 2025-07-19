@@ -37,6 +37,34 @@ int send_hello(int fd) {
 	return STATUS_SUCCESS;
 }
 
+int send_employee(int fd, char *addarg) {
+    char buf[4096] = {0};
+
+	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
+	hdr->type = MSG_EMPLOYEE_ADD_REQ;
+	hdr->len = 1;
+
+	dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
+	strncpy(&employee->data, addarg, sizeof(employee->data));
+
+	hdr->type = htonl(hdr->type);
+	hdr->len = htons(hdr->len);
+
+	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_employee_add_req));
+	printf("Sent add request to server. Employee:%s\n", addarg);
+	read(fd, buf, sizeof(buf));
+
+	hdr->type = ntohl(hdr->type);
+	hdr->len = ntohs(hdr->len);
+
+	if (hdr->type != MSG_EMPLOYEE_ADD_RESP) {
+		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
+		return STATUS_ERROR;
+	}
+	printf("Received add response from server\n");
+	return STATUS_SUCCESS;
+}
+
 int main(int argc, char *argv[]) {
 	char *portarg = NULL;
 	char *hostarg = NULL;
@@ -98,6 +126,10 @@ int main(int argc, char *argv[]) {
     if (send_hello(fd) != STATUS_SUCCESS) {
 		close(fd);
 		return -1;
+	}
+
+	if (addarg) {
+		send_employee(fd, addarg);
 	}
 
     close(fd);

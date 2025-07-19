@@ -215,7 +215,7 @@ static int find_slot_by_fd(clientstate_t *states, int fd) {
 static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client) {
     dbproto_hdr_t *hdr = (dbproto_hdr_t *)client->buffer;
 
-    hdr->type = ntohs(hdr->type);
+    hdr->type = ntohl(hdr->type);
     hdr->len = ntohs(hdr->len);
 
     if (client->state == STATE_HELLO) {
@@ -238,6 +238,12 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *emplo
     }
 
     if (client->state == STATE_MSG) {
+        if (hdr->type == MSG_EMPLOYEE_ADD_REQ) {
+
+            dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
+            printf("Adding employee: %s\n", employee->data);
+            fsm_reply_add(client, hdr);
+        }
     }
 }
 
@@ -255,6 +261,13 @@ static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr) {
     hello->proto = htons(PROTO_VER);
 
     write(client->fd, hdr, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_resp));
+}
+
+void fsm_reply_add(clientstate_t *client, dbproto_hdr_t *hdr) {
+    hdr->type = htonl(MSG_EMPLOYEE_ADD_RESP);
+    hdr->len = htons(0);
+
+    write(client->fd, hdr, sizeof(dbproto_hdr_t));
 }
 
 static void handle_signal(int sig) {
