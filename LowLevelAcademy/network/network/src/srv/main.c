@@ -24,20 +24,16 @@ void print_usage(char *argv[]) {
 
 int main(int argc, char *argv[]) { 
 	char *filepath = NULL;
-	char *addstring = NULL;
-	char *deletestring = NULL;
-	char *editstring = NULL;
 	char *portarg = NULL;
 	unsigned short port = 0;
 	bool newfile = false;
-	bool list = false;
 	int c;
 
 	int dbfd = -1;
 	struct dbheader_t *dbhdr = NULL;
 	struct employee_t *employees = NULL;
 
-	while ((c = getopt(argc, argv, "nf:p:a:ld:e:")) != -1) {
+	while ((c = getopt(argc, argv, "nf:p:")) != -1) {
 		switch (c) {
 			case 'n':
 				newfile = true;
@@ -48,18 +44,6 @@ int main(int argc, char *argv[]) {
 			case 'p':
 				portarg = optarg;
 				port = atoi(portarg);
-				break;
-			case 'a':
-				addstring = optarg;
-				break;
-			case 'l':
-				list = true;
-				break;
-			case 'd':
-				deletestring = optarg;
-				break;
-			case 'e':
-				editstring = optarg;
 				break;
 			case '?':
 				fprintf(stderr, "Unknown option -%c\n", c);
@@ -108,45 +92,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	if (read_employees(dbfd, dbhdr, &employees) != STATUS_SUCCESS) {
-		fprintf(stderr, "Error reading employees from database file: %s\n", filepath);
-		close(dbfd);
-		return -1;
-	}
-
-	if (addstring) {
-		dbhdr->count++;
-		employees = realloc(employees, dbhdr->count * sizeof(struct employee_t));
-		if (employees == NULL) {
-			fprintf(stderr, "Error reallocating memory for employees.\n");
-			close(dbfd);
-			return -1;
-		}
-
-		add_employee(dbhdr, employees, addstring);
-	}
-
-	if (list) {
-		list_employees(dbhdr, employees);
-	}
-
-	if (deletestring) {
-		if (delete_employee(dbhdr, &employees, deletestring) != STATUS_SUCCESS) {
-			fprintf(stderr, "Error deleting employee: %s\n", deletestring);
-			close(dbfd);
-			return -1;
-		}
-	}
-
-	if (editstring) {
-		if (edit_employee(dbhdr, employees, editstring) != STATUS_SUCCESS) {
-			fprintf(stderr, "Error edit employee: %s\n", editstring);
-			close(dbfd);
-			return -1;
-		}
-	}
-
-	poll_loop(port, dbhdr, employees);
+	poll_loop(port, dbhdr, &employees, dbfd);
 
     return 0;
 }

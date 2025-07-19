@@ -93,14 +93,33 @@ void list_employees(struct dbheader_t *dbhdr, struct employee_t *employees) {
     }
 }
 
-int add_employee(struct dbheader_t *dbhdr, struct employee_t *employees, char *addstring) {
-    char *name = strtok(addstring, ",");
-    char *addr = strtok(NULL, ",");
-    char *hours = strtok(NULL, ",");
+int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *addstring) {
+    printf("DB currently has %d\n", dbhdr->count);
 
-    strncpy(employees[dbhdr->count-1].name, name, sizeof(employees[dbhdr->count-1].name));
-    strncpy(employees[dbhdr->count-1].address, addr, sizeof(employees[dbhdr->count-1].address));
-    employees[dbhdr->count-1].hours = atoi(hours);
+    char *name = strtok(addstring, ",");
+    if (name == NULL) {
+        fprintf(stderr, "Invalid addstring format\n");
+        return STATUS_ERROR;
+    }
+    char *addr = strtok(NULL, ",");
+    if (addr == NULL) {
+        fprintf(stderr, "Invalid addstring format\n");
+        return STATUS_ERROR;
+    }
+    char *hours = strtok(NULL, ",");
+    if (hours == NULL) {
+        fprintf(stderr, "Invalid addstring format\n");
+        return STATUS_ERROR;
+    }
+
+    dbhdr->count++;
+    *employees = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
+
+    struct employee_t *new_emp = &((*employees)[dbhdr->count-1]);
+
+    strncpy(new_emp->name, name, sizeof(new_emp->name));
+    strncpy(new_emp->address, addr, sizeof(new_emp->address));
+    new_emp->hours = atoi(hours);
 
     return STATUS_SUCCESS;
 }

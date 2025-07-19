@@ -20,11 +20,12 @@ static void prepare_poll_fds(struct pollfd *fds, int listen_fd, int *nfds);
 static int find_free_slot(clientstate_t *states);
 static int find_slot_by_fd(clientstate_t *states, int fd);
 static void handle_signal(int sig);
-static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client);
-static void fsm_reply_hello_err(clientstate_t *client, dbproto_hdr_t *hdr);
+static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **employees, clientstate_t *client, int dbfd);
+static void fsm_reply_err(clientstate_t *client, dbproto_hdr_t *hdr);
 static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr);
+static void fsm_reply_add(clientstate_t *client, dbproto_hdr_t *hdr);
 
-void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees) {
+void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t **employees, int dbfd) {
     int conn_fd, freeSlot;
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
@@ -103,7 +104,7 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
                         nfds--;
                     }
                 } else {
-                   handle_client_fsm(dbhdr, employees, &clientStates[slot]);
+                   handle_client_fsm(dbhdr, employees, &clientStates[slot], dbfd);
                 }
             }
         }
@@ -212,10 +213,10 @@ static int find_slot_by_fd(clientstate_t *states, int fd) {
     return -1; /* No slot found for the given file descriptor */
 }
 
-static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *employees, clientstate_t *client) {
+static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **employees, clientstate_t *client, int dbfd) {
     dbproto_hdr_t *hdr = (dbproto_hdr_t *)client->buffer;
 
-    hdr->type = ntohs(hdr->type);
+    hdr->type = ntohl(hdr->type);
     hdr->len = ntohs(hdr->len);
 
     if (client->state == STATE_HELLO) {
@@ -228,7 +229,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *emplo
         hello_req->proto = ntohs(hello_req->proto);
         if (hello_req->proto != PROTO_VER) {
             printf("Client %d sent unsupported protocol version %d\n", client->fd, hello_req->proto);
-            fsm_reply_hello_err(client, hdr);
+            fsm_reply_err(client, hdr);
             return;
         }
 
@@ -238,10 +239,22 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t *emplo
     }
 
     if (client->state == STATE_MSG) {
+        if (hdr->type == MSG_EMPLOYEE_ADD_REQ) {
+
+            dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
+            printf("Adding employee: %s\n", employee->data);
+            if (add_employee(dbhdr, employees, employee->data) != STATUS_SUCCESS) {
+                fsm_reply_err(client, hdr);
+                return;
+            } else {
+                fsm_reply_add(client,hdr);
+                output_file(dbfd, dbhdr, employees);
+            }
+        }
     }
 }
 
-static void fsm_reply_hello_err(clientstate_t *client, dbproto_hdr_t *hdr) {
+static void fsm_reply_err(clientstate_t *client, dbproto_hdr_t *hdr) {
     hdr->type = htonl(MSG_ERROR);
     hdr->len = htons(0);
 
@@ -255,6 +268,13 @@ static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr) {
     hello->proto = htons(PROTO_VER);
 
     write(client->fd, hdr, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_resp));
+}
+
+static void fsm_reply_add(clientstate_t *client, dbproto_hdr_t *hdr) {
+    hdr->type = htonl(MSG_EMPLOYEE_ADD_RESP);
+    hdr->len = htons(0);
+
+    write(client->fd, hdr, sizeof(dbproto_hdr_t));
 }
 
 static void handle_signal(int sig) {
