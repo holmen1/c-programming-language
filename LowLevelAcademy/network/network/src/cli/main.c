@@ -37,7 +37,7 @@ int send_hello(int fd) {
 	return STATUS_SUCCESS;
 }
 
-int send_employee(int fd, char *addarg) {
+int send_employee(int fd, char *addstring) {
     char buf[4096] = {0};
 
 	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
@@ -45,13 +45,13 @@ int send_employee(int fd, char *addarg) {
 	hdr->len = 1;
 
 	dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
-	strncpy(&employee->data, addarg, sizeof(employee->data));
+	strncpy(&employee->data, addstring, sizeof(employee->data));
 
 	hdr->type = htonl(hdr->type);
 	hdr->len = htons(hdr->len);
 
 	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_employee_add_req));
-	printf("Sent add request to server. Employee:%s\n", addarg);
+	printf("Sent add request to server. Employee:%s\n", addstring);
 	read(fd, buf, sizeof(buf));
 
 	hdr->type = ntohl(hdr->type);

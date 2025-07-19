@@ -93,10 +93,15 @@ void list_employees(struct dbheader_t *dbhdr, struct employee_t *employees) {
     }
 }
 
-int add_employee(struct dbheader_t *dbhdr, struct employee_t *employees, char *addstring) {
+int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *addstring) {
+    printf("DB currently has %d\n", dbhdr->count);
+
     char *name = strtok(addstring, ",");
     char *addr = strtok(NULL, ",");
     char *hours = strtok(NULL, ",");
+
+    dbhdr->count++;
+    *employees = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
 
     strncpy(employees[dbhdr->count-1].name, name, sizeof(employees[dbhdr->count-1].name));
     strncpy(employees[dbhdr->count-1].address, addr, sizeof(employees[dbhdr->count-1].address));

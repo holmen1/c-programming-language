@@ -25,6 +25,6 @@ typedef struct {
     char buffer[BUFF_SIZE]; /* Buffer for incoming data */
 } clientstate_t;
 
-void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t *employees);
+void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t **employees, int dbfd);
 
 #endif /* SRVPOLL_H */
