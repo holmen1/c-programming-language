@@ -100,12 +100,21 @@ int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *
     char *addr = strtok(NULL, ",");
     char *hours = strtok(NULL, ",");
 
+    /* Increment count and reallocate safely */
     dbhdr->count++;
-    *employees = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
+    printf("DEBUG: Before realloc, *employees=%p, count=%d\n", *employees, dbhdr->count);
+    struct employee_t *new_employees = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
+    if (new_employees == NULL) {
+        fprintf(stderr, "Failed to allocate memory for new employee\n");
+        dbhdr->count--;
+        return STATUS_ERROR;
+    }
+    
+    *employees = new_employees;
 
-    strncpy(employees[dbhdr->count-1].name, name, sizeof(employees[dbhdr->count-1].name));
-    strncpy(employees[dbhdr->count-1].address, addr, sizeof(employees[dbhdr->count-1].address));
-    employees[dbhdr->count-1].hours = atoi(hours);
+    strncpy((*employees)[dbhdr->count-1].name, name, sizeof((*employees)[dbhdr->count-1].name));
+    strncpy((*employees)[dbhdr->count-1].address, addr, sizeof((*employees)[dbhdr->count-1].address));
+    (*employees)[dbhdr->count-1].hours = atoi(hours);
 
     return STATUS_SUCCESS;
 }
