@@ -23,7 +23,7 @@ int send_hello(int fd) {
 	hello_req->proto = htons(hello_req->proto);
 
 	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_req));
-	printf("Sent hello request to server. Protocol v1\n");
+	printf("Sent hello request to server. Protocol v%d\n", PROTO_VER);
 	read(fd, buf, sizeof(buf));
 
 	hdr->type = ntohl(hdr->type);
