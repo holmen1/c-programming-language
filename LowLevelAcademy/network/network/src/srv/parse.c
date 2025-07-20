@@ -97,24 +97,29 @@ int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *
     printf("DB currently has %d\n", dbhdr->count);
 
     char *name = strtok(addstring, ",");
-    char *addr = strtok(NULL, ",");
-    char *hours = strtok(NULL, ",");
-
-    /* Increment count and reallocate safely */
-    dbhdr->count++;
-    printf("DEBUG: Before realloc, *employees=%p, count=%d\n", *employees, dbhdr->count);
-    struct employee_t *new_employees = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
-    if (new_employees == NULL) {
-        fprintf(stderr, "Failed to allocate memory for new employee\n");
-        dbhdr->count--;
+    if (name == NULL) {
+        fprintf(stderr, "Invalid addstring format\n");
         return STATUS_ERROR;
     }
-    
-    *employees = new_employees;
+    char *addr = strtok(NULL, ",");
+    if (addr == NULL) {
+        fprintf(stderr, "Invalid addstring format\n");
+        return STATUS_ERROR;
+    }
+    char *hours = strtok(NULL, ",");
+    if (hours == NULL) {
+        fprintf(stderr, "Invalid addstring format\n");
+        return STATUS_ERROR;
+    }
 
-    strncpy((*employees)[dbhdr->count-1].name, name, sizeof((*employees)[dbhdr->count-1].name));
-    strncpy((*employees)[dbhdr->count-1].address, addr, sizeof((*employees)[dbhdr->count-1].address));
-    (*employees)[dbhdr->count-1].hours = atoi(hours);
+    dbhdr->count++;
+    *employees = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
+
+    struct employee_t *new_emp = &((*employees)[dbhdr->count-1]);
+
+    strncpy(new_emp->name, name, sizeof(new_emp->name));
+    strncpy(new_emp->address, addr, sizeof(new_emp->address));
+    new_emp->hours = atoi(hours);
 
     return STATUS_SUCCESS;
 }

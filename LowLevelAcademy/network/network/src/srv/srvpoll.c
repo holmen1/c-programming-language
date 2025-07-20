@@ -243,7 +243,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
 
             dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
             printf("Adding employee: %s\n", employee->data);
-            if (add_employee(dbhdr, &employees, employee->data) != STATUS_SUCCESS) {
+            if (add_employee(dbhdr, employees, employee->data) != STATUS_SUCCESS) {
                 fsm_reply_err(client, hdr);
                 return;
             } else {
