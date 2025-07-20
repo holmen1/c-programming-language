@@ -5,64 +5,20 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 
-int send_hello(int fd) {
-    char buf[4096] = {0};
-
-	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
-	hdr->type = MSG_HELLO_REQ;
-	hdr->len = 1;
-
-	dbproto_hello_req *hello_req = (dbproto_hello_req *)&hdr[1];
-	hello_req->proto = PROTO_VER;
-
-	hdr->type = htonl(hdr->type);
-	hdr->len = htons(hdr->len);
-	hello_req->proto = htons(hello_req->proto);
-
-	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_req));
-	printf("Sent hello request to server. Protocol v%d\n", PROTO_VER);
-	read(fd, buf, sizeof(buf));
-
-	hdr->type = ntohl(hdr->type);
-	hdr->len = ntohs(hdr->len);
-
-	if (hdr->type != MSG_HELLO_RESP) {
-		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
-		return STATUS_ERROR;
-	}
-	printf("Received hello response from server. Protocol v%d\n", ntohs(hello_req->proto));
-	return STATUS_SUCCESS;
-}
-
-int send_employee(int fd, char *addstring) {
-    char buf[4096] = {0};
-
-	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
-	hdr->type = MSG_EMPLOYEE_ADD_REQ;
-	hdr->len = 1;
-
-	dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
-	strncpy(&employee->data, addstring, sizeof(employee->data));
-
-	hdr->type = htonl(hdr->type);
-	hdr->len = htons(hdr->len);
-
-	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_employee_add_req));
-	printf("Sent add request to server. Employee:%s\n", addstring);
-	read(fd, buf, sizeof(buf));
-
-	hdr->type = ntohl(hdr->type);
-	hdr->len = ntohs(hdr->len);
-
-	if (hdr->type != MSG_EMPLOYEE_ADD_RESP) {
-		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
-		return STATUS_ERROR;
-	}
-	printf("Received add response from server\n");
-	return STATUS_SUCCESS;
+int send_hello(int fd);
+int send_employee(int fd, char *addstring);
+void print_usage(char *argv[]) {
+    printf("Usage: %s -h <host> -p <port> [-a <addarg>]\n", argv[0]);
+	printf("Options:\n");
+	printf("\t -h <host>   (required) host to connect to\n");
+	printf("\t -p <port>   (required) port to connect to\n");
+	printf("\t -a <addarg> Add a new employee with the given string format 'name,address,hours'\n");
+	exit(1);
 }
 
 int main(int argc, char *argv[]) {
@@ -86,22 +42,16 @@ int main(int argc, char *argv[]) {
 				break;
 			case '?':
 				fprintf(stderr, "Unknown option -%c\n", c);
-				break;
+				print_usage(argv);
+				return -1;
 			default:
 				return -1;
 
 		}
 	}
 
-	if (hostarg == NULL) {
-		fprintf(stderr, "Host is a required argument\n");
-		fprintf(stderr, "Usage: %s -p <port> -h <host> [-a <addarg>]\n", argv[0]);
-		return -1;
-	}
-
-	if (port == 0) {
-		fprintf(stderr, "Bad port: %s\n", portarg);
-		fprintf(stderr, "Usage: %s -p <port> -h <host> [-a <addarg>]\n", argv[0]);
+	if (hostarg == NULL || portarg == NULL) {
+		print_usage(argv);
 		return -1;
 	}
 
@@ -134,4 +84,62 @@ int main(int argc, char *argv[]) {
 
     close(fd);
     return 0;
+}
+
+
+int send_hello(int fd) {
+    char buf[4096] = {0};
+
+	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
+	hdr->type = MSG_HELLO_REQ;
+	hdr->len = 1;
+
+	dbproto_hello_req *hello_req = (dbproto_hello_req *)&hdr[1];
+	hello_req->proto = PROTO_VER;
+
+	hdr->type = htonl(hdr->type);
+	hdr->len = htons(hdr->len);
+	hello_req->proto = htons(hello_req->proto);
+
+	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_req));
+	read(fd, buf, sizeof(buf));
+
+	hdr->type = ntohl(hdr->type);
+	hdr->len = ntohs(hdr->len);
+
+	if (hdr->type != MSG_HELLO_RESP) {
+		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
+		return STATUS_ERROR;
+	}
+	printf("Received hello response from server. Protocol v%d\n", ntohs(hello_req->proto));
+	
+	return STATUS_SUCCESS;
+}
+
+int send_employee(int fd, char *addstring) {
+    char buf[4096] = {0};
+
+	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
+	hdr->type = MSG_EMPLOYEE_ADD_REQ;
+	hdr->len = 1;
+
+	dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
+	strncpy((char *)employee->data, addstring, sizeof(employee->data));
+
+	hdr->type = htonl(hdr->type);
+	hdr->len = htons(hdr->len);
+
+	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_employee_add_req));
+	printf("Sent add request to server. Employee:%s\n", addstring);
+	read(fd, buf, sizeof(buf));
+
+	hdr->type = ntohl(hdr->type);
+	hdr->len = ntohs(hdr->len);
+
+	if (hdr->type != MSG_EMPLOYEE_ADD_RESP) {
+		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
+		return STATUS_ERROR;
+	}
+	printf("Received add response from server\n");
+	return STATUS_SUCCESS;
 }

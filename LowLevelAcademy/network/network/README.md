@@ -16,25 +16,19 @@ The project uses a dual-Makefile approach for clarity and separation of concerns
 | Target | Description |
 |--------|-------------|
 | `make` | Default target that builds the server |
-| `make server-only` | Build the server without running it |
-| `make run` | Build and run the server on port 8080 |
 | `make debug` | Build with debug symbols and no optimization |
 | `make clean` | Remove compiled files and databases |
 
 ### Usage Examples
 
 ```bash
-# Just build the server
-make
+# Run server, create new database
+./dbserver -n -f my.db -p 8080
+```
 
-# Build and run the server on port 8080
-make run
-
-# Build with debugging symbols
-make debug
-
-# Clean up all generated files
-make clean
+```bash
+# Run client, add employee
+./dbcli -h 127.0.0.1 -p 8080 -a "Mats,46 Hallandsgatan,200"
 ```
 
 ## Testing Framework
