@@ -248,7 +248,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
                 return;
             } else {
                 fsm_reply_add(client,hdr);
-                output_file(dbfd, dbhdr, employees);
+                output_file(dbfd, dbhdr, *employees);
             }
         }
     }

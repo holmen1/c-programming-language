@@ -94,6 +94,8 @@ void list_employees(struct dbheader_t *dbhdr, struct employee_t *employees) {
 }
 
 int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *addstring) {
+    printf("DEBUG: add_employee called with dbhdr=%p, *employees=%p, addstring='%s'\n", 
+        dbhdr, *employees, addstring);
     printf("DB currently has %d\n", dbhdr->count);
 
     char *name = strtok(addstring, ",");
@@ -112,6 +114,8 @@ int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *
         return STATUS_ERROR;
     }
 
+    printf("DEBUG: Parsed tokens: name='%s', addr='%s', hours='%s'\n", name, addr, hours);
+
     dbhdr->count++;
     *employees = realloc(*employees, dbhdr->count * sizeof(struct employee_t));
 
@@ -120,6 +124,15 @@ int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *
     strncpy(new_emp->name, name, sizeof(new_emp->name));
     strncpy(new_emp->address, addr, sizeof(new_emp->address));
     new_emp->hours = atoi(hours);
+
+    printf("DEBUG: New employee data: name='%s', address='%s', hours=%d\n", 
+        new_emp->name, new_emp->address, new_emp->hours);
+
+    printf("DEBUG: Memory at new_emp: %02X %02X %02X %02X %02X %02X %02X %02X\n",
+        ((unsigned char*)new_emp)[0], ((unsigned char*)new_emp)[1],
+        ((unsigned char*)new_emp)[2], ((unsigned char*)new_emp)[3],
+        ((unsigned char*)new_emp)[4], ((unsigned char*)new_emp)[5],
+        ((unsigned char*)new_emp)[6], ((unsigned char*)new_emp)[7]);
 
     return STATUS_SUCCESS;
 }
@@ -148,6 +161,8 @@ int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employe
 }
 
 int output_file(int fd, struct dbheader_t *dbhdr, struct employee_t *employees) {
+    printf("DEBUG: Writing employee[0] - Name: '%s', Address: '%s', Hours: %d\n",
+        employees[0].name, employees[0].address, employees[0].hours);
     if (fd < 0) {
         perror("output_file: Invalid file descriptor");
         return STATUS_ERROR;
@@ -168,7 +183,13 @@ int output_file(int fd, struct dbheader_t *dbhdr, struct employee_t *employees) 
     for (; i < realcount; i++) {
         employees[i].hours = htonl(employees[i].hours);
         write(fd, &employees[i], sizeof(struct employee_t));
+        employees[i].hours = ntohl(employees[i].hours);
     }
+
+    dbhdr->magic = ntohl(dbhdr->magic);
+	dbhdr->filesize = ntohl(sizeof(struct dbheader_t) + (sizeof(struct employee_t) * realcount));
+	dbhdr->count = ntohs(dbhdr->count);
+	dbhdr->version = ntohs(dbhdr->version);
 
     /* Ensures the file size always matches what's specified in the header */
     ftruncate(fd, sizeof(struct dbheader_t) + sizeof(struct employee_t) * realcount);
