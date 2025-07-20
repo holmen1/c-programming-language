@@ -15,10 +15,6 @@ void print_usage(char *argv[]) {
     printf("\t -n          create new database file\n");
     printf("\t -f <file>   (required) database file path\n");
     printf("\t -p <port>   (required) port to listen on\n");
-	printf("\t -a <string> Add a new employee with the given string format 'name,address,hours'\n");
-	printf("\t -l          List all employees in the database\n");
-	printf("\t -d <name>    Delete employee with the given name\n");
-    printf("\t -e <string>  Edit employee with format 'name,new_address,new_hours'\n");
     exit(1);
 }
 
