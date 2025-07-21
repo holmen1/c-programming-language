@@ -43,7 +43,8 @@ int main(int argc, char *argv[]) {
 				break;
 			case '?':
 				fprintf(stderr, "Unknown option -%c\n", c);
-				break;
+				print_usage(argv);
+				return -1;
 			default:
 				return -1;
 
