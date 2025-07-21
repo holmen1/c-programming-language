@@ -4,7 +4,6 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <string.h>
 
 #include "common.h"
@@ -169,8 +168,6 @@ int output_file(int fd, struct dbheader_t *dbhdr, struct employee_t *employees) 
     dbhdr->count = ntohs(dbhdr->count);
 	dbhdr->filesize = ntohl(sizeof(struct dbheader_t) + (sizeof(struct employee_t) * realcount));
 
-    /* Ensures the file size always matches what's specified in the header */
-    ftruncate(fd, sizeof(struct dbheader_t) + sizeof(struct employee_t) * realcount);
     return STATUS_SUCCESS;
 }	
 

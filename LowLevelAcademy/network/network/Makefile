@@ -9,19 +9,18 @@ OBJ_SRV = $(SRC_SRV:src/srv/%.c=obj/srv/%.o)
 SRC_CLI = $(wildcard src/cli/*.c)
 OBJ_CLI = $(SRC_CLI:src/cli/%.c=obj/cli/%.o)
 
-.PHONY: default clean server-only run test-server debug directories cleanup
+.PHONY: all clean directories
 
-default: $(TARGET_SRV) $(TARGET_CLI)
+all: directories $(TARGET_SRV) $(TARGET_CLI)
 
-# Build targets
-server-only: $(TARGET_SRV)
-
+# Build server
 $(TARGET_SRV): $(OBJ_SRV)
 	gcc $(CFLAGS) -o $@ $(OBJ_SRV)
 
 $(OBJ_SRV): obj/srv/%.o: src/srv/%.c
 	gcc $(CFLAGS) -c $< -o $@ -Iinclude
 
+# Build the client
 $(TARGET_CLI): $(OBJ_CLI)
 	gcc $(CFLAGS) -o $@ $(OBJ_CLI)
 
@@ -45,24 +44,3 @@ clean: cleanup
 	rm -f obj/srv/*.o obj/cli/*.o
 	rm -f bin/*
 	rm -f *.db
-
-# Run server
-run-server: clean server-only
-	@echo "Starting server on port 8080..."
-	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 & \
-	SERVER_PID=$$!; \
-	echo "Server running with PID: $$SERVER_PID"; \
-	echo "Press Ctrl+C to stop the server"; \
-	trap "echo 'Stopping server...'; kill -TERM $$SERVER_PID; sleep 2; kill -9 $$SERVER_PID 2>/dev/null || true; exit 0" INT TERM; \
-	while kill -0 $$SERVER_PID 2>/dev/null; do sleep 1; done
-
-run: clean default
-	./$(TARGET_SRV) -f ./mynewdb.db -n -p 8080 &
-
-# Updated help target to include the new build-all option
-help:
-	@echo "Available targets:"
-	@echo "  make            - Build server and client"
-	@echo "  make build-all  - Build everything and verify (no execution)"
-	@echo "  make run-server - Run server only"
-	@echo "  make run        - Run both server and client"

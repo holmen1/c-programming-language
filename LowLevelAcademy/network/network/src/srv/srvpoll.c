@@ -243,7 +243,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
 
             dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
             printf("Adding employee: %s\n", employee->data);
-            if (add_employee(dbhdr, employees, employee->data) != STATUS_SUCCESS) {
+            if (add_employee(dbhdr, employees, (char *)employee->data) != STATUS_SUCCESS) {
                 fsm_reply_err(client, hdr);
                 return;
             } else {
@@ -264,7 +264,7 @@ static void fsm_reply_err(clientstate_t *client, dbproto_hdr_t *hdr) {
 static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr) {
     hdr->type = htonl(MSG_HELLO_RESP);
     hdr->len = htons(1);
-    dbproto_hello_resp* hello = (dbproto_hello_req*)&hdr[1];
+    dbproto_hello_resp* hello = (dbproto_hello_resp*)&hdr[1];
     hello->proto = htons(PROTO_VER);
 
     write(client->fd, hdr, sizeof(dbproto_hdr_t) + sizeof(dbproto_hello_resp));

@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 
@@ -122,7 +124,7 @@ int send_employee(int fd, char *addstring) {
 	hdr->len = 1;
 
 	dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
-	strncpy(&employee->data, addstring, sizeof(employee->data));
+	strncpy((char *)employee->data, addstring, sizeof(employee->data));
 
 	hdr->type = htonl(hdr->type);
 	hdr->len = htons(hdr->len);
