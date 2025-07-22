@@ -27,10 +27,6 @@ $(TARGET_CLI): $(OBJ_CLI)
 $(OBJ_CLI): obj/cli/%.o: src/cli/%.c
 	gcc $(CFLAGS) -c $< -o $@ -Iinclude
 
-# Debug build
-debug: CFLAGS += -g -O0
-debug: clean default
-
 # Directory creation
 directories:
 	mkdir -p bin obj/srv obj/cli

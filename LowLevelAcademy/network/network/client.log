@@ -1,0 +1,3 @@
+Received hello response from server. Protocol v100
+Sent add request to server. Employee:Test Employee,123 Test St,40
+Received add response from server

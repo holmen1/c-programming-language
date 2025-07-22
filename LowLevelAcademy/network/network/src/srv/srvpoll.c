@@ -40,7 +40,11 @@ void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t 
     init_clients(clientStates);
     
     listen_fd = setup_server_socket(port);
-    printf("Server started on port %d. Connect with: nc localhost %d\n", port, port);
+    printf("  DATABASE SERVER STARTED SUCCESSFULLY\n");
+    printf("  Listening on: 0.0.0.0:%d\n", port);
+    printf("\n  CONNECT CLIENT:\n");
+    printf("  ./bin/dbcli -h localhost -p %d\n", port);
+
     
     while (keep_running) {
         /*
