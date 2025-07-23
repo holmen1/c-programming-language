@@ -167,24 +167,28 @@ int list_employees(int fd) {
 	hdr->len = htons(hdr->len);
 	write(fd, buf, sizeof(dbproto_hdr_t));
 	printf("Sent employee list request to server\n");
-	read(fd, buf, sizeof(buf));
 
+	read(fd, hdr, sizeof(dbproto_hdr_t));
 	hdr->type = ntohl(hdr->type);
 	hdr->len = ntohs(hdr->len);
-	if (hdr->type != MSG_EMPLOYEE_LIST_RESP) {
-		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
+	if (hdr->type == MSG_ERROR) {
+		printf("Unable to list employees.\n");
+		close(fd);
 		return STATUS_ERROR;
+	} 
+
+	if (hdr->type == MSG_EMPLOYEE_LIST_RESP) {
+		int count = hdr->len;
+		printf("Received employee list response from server. Count: %d\n", count);
+
+		dbproto_employee_list_resp *employee = (dbproto_employee_list_resp *)&hdr[1];
+		int i = 0;
+		for (; i < count; i++) {
+			read(fd, employee, sizeof(dbproto_employee_list_resp));
+			employee->hours = ntohl(employee->hours);
+			printf("%s, %s, %d\n", employee->name, employee->address, employee->hours);			
+		}
 	}
-	dbproto_employee_list_resp *employee = (dbproto_employee_list_resp *)&hdr[1];
-	int count = hdr->len / sizeof(dbproto_employee_list_resp);
-	printf("Received employee list response from server. Count: %d\n", count);
-	int i = 0;
-	for (; i < count; i++) {
-		printf("Employee %d:\n", i + 1);
-		printf("\tName: %s\n", employee[i].name);
-		printf("\tAddress: %s\n", employee[i].address);
-		printf("\tHours: %d\n", ntohl(employee[i].hours));
-		
-	}
+
 	return STATUS_SUCCESS;
 }
