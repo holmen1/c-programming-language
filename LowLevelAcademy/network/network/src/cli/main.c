@@ -7,28 +7,33 @@
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "common.h"
 
 int send_hello(int fd);
 int send_employee(int fd, char *addstring);
+int list_employees(int fd);
+
 void print_usage(char *argv[]) {
     printf("Usage: %s -h <host> -p <port> [-a <addarg>]\n", argv[0]);
 	printf("Options:\n");
 	printf("\t -h <host>   (required) host to connect to\n");
 	printf("\t -p <port>   (required) port to connect to\n");
 	printf("\t -a <addarg> Add a new employee with the given string format 'name,address,hours'\n");
+	printf("\t -l List all employees in the database\n");
 	exit(1);
 }
 
 int main(int argc, char *argv[]) {
 	char *portarg = NULL;
 	char *hostarg = NULL;
-	char *addarg = NULL; 
+	char *addarg = NULL;
+	bool list = false;
 	unsigned short port = 0;
 	
 	int c;
-	while ((c = getopt(argc, argv, "h:p:a:")) != -1) {
+	while ((c = getopt(argc, argv, "h:p:a:l")) != -1) {
 		switch (c) {
 			case 'h':
 				hostarg = optarg;
@@ -39,6 +44,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'a':
 				addarg = optarg;
+				break;
+			case 'l':
+				list = true;
 				break;
 			case '?':
 				fprintf(stderr, "Unknown option -%c\n", c);
@@ -80,6 +88,10 @@ int main(int argc, char *argv[]) {
 
 	if (addarg) {
 		send_employee(fd, addarg);
+	}
+
+	if (list) {
+		list_employees(fd);
 	}
 
     close(fd);
@@ -124,7 +136,8 @@ int send_employee(int fd, char *addstring) {
 	hdr->len = 1;
 
 	dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
-	strncpy((char *)employee->data, addstring, sizeof(employee->data));
+	strncpy((char *)employee->data, addstring, sizeof(employee->data) - 1);
+	employee->data[sizeof(employee->data) - 1] = '\0'; /* proper null-termination */
 
 	hdr->type = htonl(hdr->type);
 	hdr->len = htons(hdr->len);
@@ -141,5 +154,37 @@ int send_employee(int fd, char *addstring) {
 		return STATUS_ERROR;
 	}
 	printf("Received add response from server\n");
+	return STATUS_SUCCESS;
+}
+
+int list_employees(int fd) {
+    char buf[4096] = {0};
+	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
+	hdr->type = MSG_EMPLOYEE_LIST_REQ;
+	hdr->len = 0;
+
+	hdr->type = htonl(hdr->type);
+	hdr->len = htons(hdr->len);
+	write(fd, buf, sizeof(dbproto_hdr_t));
+	printf("Sent employee list request to server\n");
+	read(fd, buf, sizeof(buf));
+
+	hdr->type = ntohl(hdr->type);
+	hdr->len = ntohs(hdr->len);
+	if (hdr->type != MSG_EMPLOYEE_LIST_RESP) {
+		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
+		return STATUS_ERROR;
+	}
+	dbproto_employee_list_resp *employee = (dbproto_employee_list_resp *)&hdr[1];
+	int count = hdr->len / sizeof(dbproto_employee_list_resp);
+	printf("Received employee list response from server. Count: %d\n", count);
+	int i = 0;
+	for (; i < count; i++) {
+		printf("Employee %d:\n", i + 1);
+		printf("\tName: %s\n", employee[i].name);
+		printf("\tAddress: %s\n", employee[i].address);
+		printf("\tHours: %d\n", ntohl(employee[i].hours));
+		
+	}
 	return STATUS_SUCCESS;
 }
