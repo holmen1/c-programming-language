@@ -239,7 +239,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
         }
 
         fsm_reply_hello(client, hdr);
-        client->state = STATE_MSG;  /* Move to MSG state */
+        client->state = STATE_MSG;
         printf("Client %d sent valid hello request, moving to MSG state\n", client->fd);
     }
 
