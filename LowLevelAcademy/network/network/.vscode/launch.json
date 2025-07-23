@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/dbserver",
-            "args": ["-f", "./debug.db", "-n", "-p", "8080"],
+            "args": ["-f", "./debug.db", "-p", "8080"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
