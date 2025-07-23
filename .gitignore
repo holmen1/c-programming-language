@@ -11,6 +11,9 @@
 *.out
 *.exe
 
+# Database files
+*.db
+
 # Debug files
 *.dSYM/
 *.dSYM/*
@@ -22,6 +25,9 @@
 *.swo
 *.bak
 *.old
+
+# Ignore all bin directory contents
+**/bin/*
 
 cmake-build-debug/
 
