@@ -89,6 +89,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
+	read_db(dbfd, dbhdr, &employees);
 	poll_loop(port, dbhdr, &employees, dbfd);
 
     return 0;

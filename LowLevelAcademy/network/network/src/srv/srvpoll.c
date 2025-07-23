@@ -24,6 +24,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
 static void fsm_reply_err(clientstate_t *client, dbproto_hdr_t *hdr);
 static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr);
 static void fsm_reply_add(clientstate_t *client, dbproto_hdr_t *hdr);
+static void fsm_reply_list(clientstate_t *client, struct dbheader_t *dbhdr, struct employee_t **employees);
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t **employees, int dbfd) {
     int conn_fd, freeSlot;
@@ -244,7 +245,6 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
 
     if (client->state == STATE_MSG) {
         if (hdr->type == MSG_EMPLOYEE_ADD_REQ) {
-
             dbproto_employee_add_req *employee = (dbproto_employee_add_req *)&hdr[1];
             printf("Adding employee: %s\n", employee->data);
             if (add_employee(dbhdr, employees, (char *)employee->data) != STATUS_SUCCESS) {
@@ -254,6 +254,10 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
                 fsm_reply_add(client,hdr);
                 output_file(dbfd, dbhdr, *employees);
             }
+        }
+        if (hdr->type == MSG_EMPLOYEE_LIST_REQ) {
+            printf("Listing all employees\n");
+            fsm_reply_list(client, dbhdr, employees);
         }
     }
 }
@@ -279,6 +283,24 @@ static void fsm_reply_add(clientstate_t *client, dbproto_hdr_t *hdr) {
     hdr->len = htons(0);
 
     write(client->fd, hdr, sizeof(dbproto_hdr_t));
+}
+
+static void fsm_reply_list(clientstate_t *client, struct dbheader_t *dbhdr, struct employee_t **employees) {
+    dbproto_hdr_t *hdr = (dbproto_hdr_t*)client->buffer;
+    hdr->type = htonl(MSG_EMPLOYEE_LIST_RESP);
+    hdr->len = htons(dbhdr->count);
+
+    write(client->fd, hdr, sizeof(dbproto_hdr_t));
+
+    dbproto_employee_list_resp *employee = (dbproto_employee_list_resp *)&hdr[1];
+
+    int i = 0;
+    for (; i < dbhdr->count; i++) {
+        strncpy(employee->name, (*employees)[i].name, sizeof(employee->name));
+        strncpy(employee->address, (*employees)[i].address, sizeof(employee->address));
+        employee->hours = htonl((*employees)[i].hours);
+        write(client->fd, employee, sizeof(dbproto_employee_list_resp));
+    }
 }
 
 static void handle_signal(int sig) {

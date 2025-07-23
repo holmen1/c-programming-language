@@ -116,16 +116,21 @@ int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *
     return STATUS_SUCCESS;
 }
 
-int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employeesOut) {
+int read_db(int fd, struct dbheader_t *dbhdr, struct employee_t **employeesOut) {
     if (fd < 0) {
-        perror("read_employees: Invalid file descriptor");
+        perror("read_db: Invalid file descriptor");
         return STATUS_ERROR;
     }
 
     int count = dbhdr->count;
+    if (count == 0) {
+        *employeesOut = NULL;
+        return STATUS_SUCCESS;
+    }
+
     struct employee_t *employees = calloc(count, sizeof(struct employee_t));
     if (employees == NULL) {
-        perror("read_employees: calloc failed");
+        perror("read_db: calloc failed");
         return STATUS_ERROR;
     }
 
@@ -135,6 +140,7 @@ int read_employees(int fd, struct dbheader_t *dbhdr, struct employee_t **employe
         employees[i].hours = ntohl(employees[i].hours);
     }
 
+    printf("Successfully read %d employee(s) from database\n", count);
     *employeesOut = employees;
     return STATUS_SUCCESS;
 }
