@@ -24,6 +24,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
 static void fsm_reply_err(clientstate_t *client, dbproto_hdr_t *hdr);
 static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr);
 static void fsm_reply_add(clientstate_t *client, dbproto_hdr_t *hdr);
+static void fsm_reply_delete(clientstate_t *client, dbproto_hdr_t *hdr);
 static void fsm_reply_list(clientstate_t *client, struct dbheader_t *dbhdr, struct employee_t **employees);
 
 void poll_loop(unsigned short port, struct dbheader_t *dbhdr, struct employee_t **employees, int dbfd) {
@@ -255,6 +256,17 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
                 output_file(dbfd, dbhdr, *employees);
             }
         }
+        if (hdr->type == MSG_EMPLOYEE_DEL_REQ) {
+            dbproto_employee_delete_req *employee = (dbproto_employee_delete_req *)&hdr[1];
+            printf("Deleting employee: %s\n", employee->name);
+            if (delete_employee(dbhdr, employees, (char *)employee->name) != STATUS_SUCCESS) {
+                fsm_reply_err(client, hdr);
+                return;
+            } else {
+                fsm_reply_delete(client, hdr);
+                output_file(dbfd, dbhdr, *employees);
+            }
+        }
         if (hdr->type == MSG_EMPLOYEE_LIST_REQ) {
             printf("Listing all employees\n");
             fsm_reply_list(client, dbhdr, employees);
@@ -280,6 +292,13 @@ static void fsm_reply_hello(clientstate_t *client, dbproto_hdr_t *hdr) {
 
 static void fsm_reply_add(clientstate_t *client, dbproto_hdr_t *hdr) {
     hdr->type = htonl(MSG_EMPLOYEE_ADD_RESP);
+    hdr->len = htons(0);
+
+    write(client->fd, hdr, sizeof(dbproto_hdr_t));
+}
+
+static void fsm_reply_delete(clientstate_t *client, dbproto_hdr_t *hdr) {
+    hdr->type = htonl(MSG_EMPLOYEE_DEL_RESP);
     hdr->len = htons(0);
 
     write(client->fd, hdr, sizeof(dbproto_hdr_t));

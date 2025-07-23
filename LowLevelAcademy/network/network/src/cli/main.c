@@ -13,6 +13,7 @@
 
 int send_hello(int fd);
 int send_employee(int fd, char *addstring);
+int delete_employee(int fd, char *name);
 int list_employees(int fd);
 
 void print_usage(char *argv[]) {
@@ -22,6 +23,7 @@ void print_usage(char *argv[]) {
 	printf("\t -p <port>   (required) port to connect to\n");
 	printf("\t -a <addarg> Add a new employee with the given string format 'name,address,hours'\n");
 	printf("\t -l List all employees in the database\n");
+	printf("\t -d <name>    Delete employee with the given name\n");
 	exit(1);
 }
 
@@ -29,11 +31,12 @@ int main(int argc, char *argv[]) {
 	char *portarg = NULL;
 	char *hostarg = NULL;
 	char *addarg = NULL;
+	char *deletestring = NULL;
 	bool list = false;
 	unsigned short port = 0;
 	
 	int c;
-	while ((c = getopt(argc, argv, "h:p:a:l")) != -1) {
+	while ((c = getopt(argc, argv, "h:p:a:ld:")) != -1) {
 		switch (c) {
 			case 'h':
 				hostarg = optarg;
@@ -47,6 +50,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'l':
 				list = true;
+				break;
+			case 'd':
+				deletestring = optarg;
 				break;
 			case '?':
 				fprintf(stderr, "Unknown option -%c\n", c);
@@ -88,6 +94,10 @@ int main(int argc, char *argv[]) {
 
 	if (addarg) {
 		send_employee(fd, addarg);
+	}
+
+	if (deletestring) {
+		delete_employee(fd, deletestring);
 	}
 
 	if (list) {
@@ -154,6 +164,35 @@ int send_employee(int fd, char *addstring) {
 		return STATUS_ERROR;
 	}
 	printf("Received add response from server\n");
+	return STATUS_SUCCESS;
+}
+
+int delete_employee(int fd, char *name) {
+    char buf[4096] = {0};
+
+	dbproto_hdr_t *hdr = (dbproto_hdr_t *)buf;
+	hdr->type = MSG_EMPLOYEE_DEL_REQ;
+	hdr->len = 1;
+
+	dbproto_employee_delete_req *employee = (dbproto_employee_delete_req *)&hdr[1];
+	strncpy((char *)employee->name, name, sizeof(employee->name) - 1);
+	employee->name[sizeof(employee->name) - 1] = '\0'; /* proper null-termination */
+
+	hdr->type = htonl(hdr->type);
+	hdr->len = htons(hdr->len);
+
+	write(fd, buf, sizeof(dbproto_hdr_t) + sizeof(dbproto_employee_delete_req));
+	printf("Sent delete request to server. Employee:%s\n", name);
+	read(fd, buf, sizeof(buf));
+
+	hdr->type = ntohl(hdr->type);
+	hdr->len = ntohs(hdr->len);
+
+	if (hdr->type != MSG_EMPLOYEE_DEL_RESP) {
+		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
+		return STATUS_ERROR;
+	}
+	printf("Received delete response from server\n");
 	return STATUS_SUCCESS;
 }
 

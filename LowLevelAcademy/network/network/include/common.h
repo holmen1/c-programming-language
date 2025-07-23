@@ -39,6 +39,10 @@ typedef struct {
 
 typedef struct {
 	char name[256];
+} dbproto_employee_delete_req;
+
+typedef struct {
+	char name[256];
 	char address[256];
 	unsigned int hours;
 } dbproto_employee_list_resp;

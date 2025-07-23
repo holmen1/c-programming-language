@@ -24,6 +24,5 @@ void list_employees(struct dbheader_t *dbhdr, struct employee_t *employees);
 int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *addstring);
 int find_employee(struct dbheader_t *dbhdr, struct employee_t *employees, const char *name);
 int delete_employee(struct dbheader_t *dbhdr, struct employee_t **employees, const char *name);
-int edit_employee(struct dbheader_t *dbhdr, struct employee_t *employees, char *);
 
 #endif

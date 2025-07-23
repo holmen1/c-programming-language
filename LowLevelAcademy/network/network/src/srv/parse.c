@@ -19,29 +19,6 @@ int find_employee(struct dbheader_t *dbhdr, struct employee_t *employees, const 
     return -1;
 }
 
-int edit_employee(struct dbheader_t *dbhdr, struct employee_t *employees, char *editstring) {
-    char *edit_copy = malloc(strlen(editstring) + 1);
-    if (edit_copy == NULL) return STATUS_ERROR;
-    strcpy(edit_copy, editstring);
-    
-    char *name = strtok(edit_copy, ",");
-    char *addr = strtok(NULL, ",");
-    char *hours = strtok(NULL, ",");
-
-    int index = find_employee(dbhdr, employees, name);
-    if (index < 0) {
-        free(edit_copy);
-        return STATUS_ERROR;
-    }
-
-    strncpy(employees[index].address, addr, sizeof(employees[index].address));
-    employees[index].hours = atoi(hours);
-
-    free(edit_copy);
-    
-    return STATUS_SUCCESS;
-}
-
 int delete_employee(struct dbheader_t *dbhdr, struct employee_t **employees, const char *name) {
     int index = find_employee(dbhdr, *employees, name);
     if (index < 0) return STATUS_ERROR;
@@ -226,5 +203,3 @@ int create_db_header(int fd, struct dbheader_t **headerOut) {
     *headerOut = header;
     return STATUS_SUCCESS;	
 }
-
-
