@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	char *portarg = NULL;
 	char *hostarg = NULL;
 	char *addarg = NULL;
-	char *deletestring = NULL;
+	char *deletearg = NULL;
 	bool list = false;
 	unsigned short port = 0;
 	
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 				list = true;
 				break;
 			case 'd':
-				deletestring = optarg;
+				deletearg = optarg;
 				break;
 			case '?':
 				fprintf(stderr, "Unknown option -%c\n", c);
@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
 		send_employee(fd, addarg);
 	}
 
-	if (deletestring) {
-		delete_employee(fd, deletestring);
+	if (deletearg) {
+		delete_employee(fd, deletearg);
 	}
 
 	if (list) {
@@ -159,11 +159,17 @@ int send_employee(int fd, char *addstring) {
 	hdr->type = ntohl(hdr->type);
 	hdr->len = ntohs(hdr->len);
 
+	if (hdr->type == MSG_ERROR) {
+		printf("Unable to add employee '%s' - database error or invalid format\n", addstring);
+		return STATUS_ERROR;
+	}
+
 	if (hdr->type != MSG_EMPLOYEE_ADD_RESP) {
 		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
 		return STATUS_ERROR;
 	}
-	printf("Received add response from server\n");
+
+	printf("Successfully added employee '%s' to server\n", addstring);
 	return STATUS_SUCCESS;
 }
 
@@ -188,11 +194,16 @@ int delete_employee(int fd, char *name) {
 	hdr->type = ntohl(hdr->type);
 	hdr->len = ntohs(hdr->len);
 
+	if (hdr->type == MSG_ERROR) {
+		printf("Unable to delete employee '%s' - employee not found or database error\n", name);
+		return STATUS_ERROR;
+	}
+
 	if (hdr->type != MSG_EMPLOYEE_DEL_RESP) {
 		fprintf(stderr, "Unexpected response type: %d\n", hdr->type);
 		return STATUS_ERROR;
 	}
-	printf("Received delete response from server\n");
+	printf("Successfully deleted employee '%s' from server\n", name);
 	return STATUS_SUCCESS;
 }
 

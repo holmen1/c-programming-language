@@ -80,9 +80,9 @@ int add_employee(struct dbheader_t *dbhdr, struct employee_t **employees, char *
     return STATUS_SUCCESS;
 }
 
-int read_db(int fd, struct dbheader_t *dbhdr, struct employee_t **employeesOut) {
+int load_employee_data(int fd, struct dbheader_t *dbhdr, struct employee_t **employeesOut) {
     if (fd < 0) {
-        perror("read_db: Invalid file descriptor");
+        perror("load_employee_data: Invalid file descriptor");
         return STATUS_ERROR;
     }
 
@@ -94,7 +94,7 @@ int read_db(int fd, struct dbheader_t *dbhdr, struct employee_t **employeesOut) 
 
     struct employee_t *employees = calloc(count, sizeof(struct employee_t));
     if (employees == NULL) {
-        perror("read_db: calloc failed");
+        perror("load_employee_data: calloc failed");
         return STATUS_ERROR;
     }
 
@@ -109,9 +109,9 @@ int read_db(int fd, struct dbheader_t *dbhdr, struct employee_t **employeesOut) 
     return STATUS_SUCCESS;
 }
 
-int output_file(int fd, struct dbheader_t *dbhdr, struct employee_t *employees) {
+int write_database_to_file(int fd, struct dbheader_t *dbhdr, struct employee_t *employees) {
     if (fd < 0) {
-        perror("output_file: Invalid file descriptor");
+        perror("write_database_to_file: Invalid file descriptor");
         return STATUS_ERROR;
     }
 

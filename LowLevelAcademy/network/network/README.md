@@ -68,3 +68,43 @@ make -f Makefile.test test-socket
 kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill -l [sigspec]
    ✅ Server shut down cleanly
 \n==== Test completed successfully! ====
+
+
+# Demo
+$ make -f Makefile.demo demo 
+🧹 Cleaning up previous demo...
+\n📦 EMPLOYEE DATABASE DEMO
+==========================
+🚀 Starting database server on port 8080...
+✅ Server running (PID: 6976)
+\n👥 Adding employees...
+Received hello response from server. Protocol v100
+Sent add request to server. Employee:Alice Johnson,123 Main St,40
+Successfully added employee 'Alice Johnson,123 Main St,40' to server
+Received hello response from server. Protocol v100
+Sent add request to server. Employee:Bob Smith,456 Oak Ave,35
+Successfully added employee 'Bob Smith,456 Oak Ave,35' to server
+Received hello response from server. Protocol v100
+Sent add request to server. Employee:Carol Davis,789 Pine Rd,42
+Successfully added employee 'Carol Davis,789 Pine Rd,42' to server
+\n📋 Listing all employees:
+Received hello response from server. Protocol v100
+Sent employee list request to server
+Received employee list response from server. Count: 3
+Alice Johnson, 123 Main St, 40
+Bob Smith, 456 Oak Ave, 35
+Carol Davis, 789 Pine Rd, 42
+\n🗑️  Deleting an employee:
+Received hello response from server. Protocol v100
+Sent delete request to server. Employee:Bob Smith
+Successfully deleted employee 'Bob Smith' from server
+\n📋 Final employee list:
+Received hello response from server. Protocol v100
+Sent employee list request to server
+Received employee list response from server. Count: 2
+Alice Johnson, 123 Main St, 40
+Carol Davis, 789 Pine Rd, 42
+\n📊 Database file info:
+   Size: 1.6K   File: demo.db
+\n🛑 Shutting down server...
+\n🎉 Demo completed! Database functionality showcased successfully.

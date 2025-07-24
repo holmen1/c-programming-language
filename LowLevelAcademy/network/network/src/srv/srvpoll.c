@@ -253,7 +253,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
                 return;
             } else {
                 fsm_reply_add(client,hdr);
-                output_file(dbfd, dbhdr, *employees);
+                write_database_to_file(dbfd, dbhdr, *employees);
             }
         }
         if (hdr->type == MSG_EMPLOYEE_DEL_REQ) {
@@ -264,7 +264,7 @@ static void handle_client_fsm(struct dbheader_t *dbhdr, struct employee_t **empl
                 return;
             } else {
                 fsm_reply_delete(client, hdr);
-                output_file(dbfd, dbhdr, *employees);
+                write_database_to_file(dbfd, dbhdr, *employees);
             }
         }
         if (hdr->type == MSG_EMPLOYEE_LIST_REQ) {
