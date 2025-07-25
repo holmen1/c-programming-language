@@ -1,34 +1,148 @@
-# Network Server Project - Makefile and Testing
+# Network Server Project
 
-This document describes the build system and testing infrastructure for the network server project.
+A networked employee database system with client-server architecture:
 
-## Project Build System
+## Core Components
 
-The project uses a dual-Makefile approach for clarity and separation of concerns:
+- **Server (`dbserver`)**: 
+  - Poll-based architecture handling multiple simultaneous clients
+  - State machine for connection management (NEW → HELLO → MSG)
+  - Persistent database storage
+  - Clean signal handling for graceful shutdown
 
-- Makefile - Main build system for compiling and running the server
-- Makefile.test - Dedicated testing framework for verifying server functionality
+- **Client (`dbcli`)**:
+  - Command-line interface for database operations
+  - Implements handshaking protocol
+  - Supports add/list/delete operations
 
-## Main Makefile
+## Technical Implementation
 
-### Key Targets
+- **Network Protocol**:
+  - Custom binary protocol with version negotiation
+  - State-based message handling
+  - Connection-per-request model
 
-| Target | Description |
-|--------|-------------|
-| `make` | Default target that builds the server |
-| `make debug` | Build with debug symbols and no optimization |
-| `make clean` | Remove compiled files and databases |
+- **Database Engine**:
+  - Custom binary file format
+  - CRUD operations for employee records
+  - Atomic operations with proper error handling
+
+- **Testing Framework**:
+  - Automated test suite in Makefile.test
+  - Validation of server-client interactions
+  - Hexdump verification of database integrity
+
+This project demonstrates solid systems programming skills including:
+- Socket programming
+- Non-blocking I/O with poll()
+- Binary data protocols
+- File I/O
+- Process management
+- Client-server architecture
+
 
 ### Usage Examples
 
 ```bash
-# Run server, create new database
-./dbserver -n -f my.db -p 8080
+# Server
+$ ./bin/dbserver 
+Filepath is a required argument
+Usage: ./bin/dbserver -n -f <database_file>
+Options:
+	-n          create new database file
+	-f <file>   (required) database file path
+	-p <port>   (required) port to listen on
+$ ./bin/dbserver -n -f my.db -p 8080
+  DATABASE SERVER STARTED SUCCESSFULLY
+  Listening on: 0.0.0.0:8080
+
+  CONNECT CLIENT:
+  ./bin/dbcli -h localhost -p 8080
 ```
 
 ```bash
-# Run client, add employee
-./dbcli -h 127.0.0.1 -p 8080 -a "Mats,46 Hallandsgatan,200"
+# Client
+$ ./bin/dbcli 
+Usage: ./bin/dbcli -h <host> -p <port> [-a <addarg>]
+Options:
+	-h <host>   (required) host to connect to
+	-p <port>   (required) port to connect to
+	-a <addarg> Add a new employee with the given string format 'name,address,hours'
+	-l List all employees in the database
+	-d <name>    Delete employee with the given name
+holmen1@thinkpad ~/repos/c-programming-language/LowLevelAcademy/network/network network* $ ./bin/dbcli -h 127.0.0.1 -p 8080 -l
+Received hello response from server. Protocol v100
+Sent employee list request to server
+Received employee list response from server. Count: 0
+holmen1@thinkpad ~/repos/c-programming-language/LowLevelAcademy/network/network network* $ ./bin/dbcli -h 127.0.0.1 -p 8080 -a "Name1,A Street,10"
+Received hello response from server. Protocol v100
+Sent add request to server. Employee:Name1,A Street,10
+Successfully added employee 'Name1,A Street,10' to server
+holmen1@thinkpad ~/repos/c-programming-language/LowLevelAcademy/network/network network* $ ./bin/dbcli -h 127.0.0.1 -p 8080 -a "Name2,B Street,20"
+Received hello response from server. Protocol v100
+Sent add request to server. Employee:Name2,B Street,20
+Successfully added employee 'Name2,B Street,20' to server
+holmen1@thinkpad ~/repos/c-programming-language/LowLevelAcademy/network/network network* $ ./bin/dbcli -h 127.0.0.1 -p 8080 -a "Name3,C Street,30"
+Received hello response from server. Protocol v100
+Sent add request to server. Employee:Name3,C Street,30
+Successfully added employee 'Name3,C Street,30' to server
+holmen1@thinkpad ~/repos/c-programming-language/LowLevelAcademy/network/network network* $ ./bin/dbcli -h 127.0.0.1 -p 8080 -l
+Received hello response from server. Protocol v100
+Sent employee list request to server
+Received employee list response from server. Count: 3
+Name1, A Street, 10
+Name2, B Street, 20
+Name3, C Street, 30
+holmen1@thinkpad ~/repos/c-programming-language/LowLevelAcademy/network/network network* $ ./bin/dbcli -h 127.0.0.1 -p 8080 -d "Name2"
+Received hello response from server. Protocol v100
+Sent delete request to server. Employee:Name2
+Successfully deleted employee 'Name2' from server
+holmen1@thinkpad ~/repos/c-programming-language/LowLevelAcademy/network/network network* $ ./bin/dbcli -h 127.0.0.1 -p 8080 -l
+Received hello response from server. Protocol v100
+Sent employee list request to server
+Received employee list response from server. Count: 2
+Name1, A Street, 10
+Name3, C Street, 30
+```
+
+```bash
+Server
+New connection from 127.0.0.1:51156
+Client connected in slot 0 with fd 5
+Client 5 sent valid hello request, moving to MSG state
+Listing all employees
+Client disconnected
+New connection from 127.0.0.1:58776
+Client connected in slot 0 with fd 5
+Client 5 sent valid hello request, moving to MSG state
+Adding employee: Name1,A Street,10
+Client disconnected
+Poll timeout - no activity
+New connection from 127.0.0.1:45762
+Client connected in slot 0 with fd 5
+Client 5 sent valid hello request, moving to MSG state
+Adding employee: Name2,B Street,20
+Client disconnected
+New connection from 127.0.0.1:50056
+Client connected in slot 0 with fd 5
+Client 5 sent valid hello request, moving to MSG state
+Adding employee: Name3,C Street,30
+Client disconnected
+New connection from 127.0.0.1:55386
+Client connected in slot 0 with fd 5
+Client 5 sent valid hello request, moving to MSG state
+Listing all employees
+Client disconnected
+New connection from 127.0.0.1:42210
+Client connected in slot 0 with fd 5
+Client 5 sent valid hello request, moving to MSG state
+Deleting employee: Name2
+Client disconnected
+New connection from 127.0.0.1:35794
+Client connected in slot 0 with fd 5
+Client 5 sent valid hello request, moving to MSG state
+Listing all employees
+Client disconnected
 ```
 
 ## Testing Framework
@@ -41,9 +155,6 @@ The Makefile.test provides isolated tests for critical server functionality.
 ```bash
 # Run all tests
 make -f Makefile.test test
-
-# Run a specific test
-make -f Makefile.test test-socket
 ```
 
 ==== Testing Basic Server-Client Interaction ====
@@ -70,7 +181,12 @@ kill: usage: kill [-s sigspec | -n signum | -sigspec] pid | jobspec ... or kill 
 \n==== Test completed successfully! ====
 
 
-# Demo
+### Running Demo
+```bash
+# Run all tests
+make -f Makefile.demo demo
+```
+
 $ make -f Makefile.demo demo 
 🧹 Cleaning up previous demo...
 \n📦 EMPLOYEE DATABASE DEMO
