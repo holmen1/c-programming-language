@@ -1,9 +1,7 @@
-#include "main.h"
-#include "tcp.h"
+#include <stdlib.h>
+#include "../include/common.h"
+#include "../include/tcp.h"
 
-void debug_log(const char *message) {
-    fprintf(stderr, "DEBUG: %s\n", message);
-}
 
 int main() {
     tcp_server server = {0};
