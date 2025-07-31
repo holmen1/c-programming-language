@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "../include/common.h"
 #include "../include/tcp.h"
 #include "../include/http.h"
@@ -7,7 +8,13 @@
 void handle_client(int client_fd) {
     http_request req = {0};
 
-    if (read_http_request(client_fd, &req) == -1) {
+    if (read_http_request(client_fd, &req) == HTTP_PARSE_INVALID) {
+        debug_log("Failed to read or parse HTTP request");
+        close(client_fd);
+        return;
+    }
+
+    if (parse_http_headers(req.buffer, &req) == HTTP_PARSE_INVALID) {
         debug_log("Failed to read or parse HTTP request");
         close(client_fd);
         return;
@@ -18,6 +25,13 @@ void handle_client(int client_fd) {
     debug_log(req.path);
     debug_log(req.protocol);
 
+    char header_buf[800];
+    for (int i = 0; i < req.header_count; ++i) {
+        snprintf(header_buf, sizeof(header_buf), "Key: %s\tValue: %s", req.headers[i].key, req.headers[i].value);
+        debug_log(header_buf);
+    }
+
+    free_http_headers(&req);
     close(client_fd);
 }
 
