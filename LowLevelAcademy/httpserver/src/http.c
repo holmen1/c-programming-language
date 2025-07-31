@@ -1,7 +1,17 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "http.h"
+#include "../include/http.h"
+
+void parse_http_headers(const char *raw_request, http_request *request) {
+    char buf[10] = {0};
+    const char *crlf = strstr(raw_request, "\r\n");
+    if (crlf) {
+        const char *line_start = crlf + 2;
+        strncpy(buf, line_start, 10);
+        printf("parsed %s\n", buf);
+    }
+}
 
 int read_http_request(int socket_fd, http_request *request) {
     char buffer[HTTP_METHOD_MAX_LEN + HTTP_PATH_MAX_LEN + HTTP_PROTOCOL_MAX_LEN + 3] = {0};
@@ -12,6 +22,11 @@ int read_http_request(int socket_fd, http_request *request) {
     }
 
     buffer[bytes_read] = '\0';
+
+    // Ensure the buffer is null-terminated, save for http headers parsing
+    char buffer_copy[sizeof(buffer)];
+    strncpy(buffer_copy, buffer, sizeof(buffer_copy));
+    buffer_copy[sizeof(buffer_copy) - 1] = '\0';
 
     // Parse the request line
     // Example request line: "GET /index.html HTTP/1.1\r\n"
@@ -32,6 +47,7 @@ int read_http_request(int socket_fd, http_request *request) {
         return -1; // Failed to parse the request line
     }
     */
-
+    parse_http_headers(buffer_copy, request);
     return 0;
 }
+

@@ -11,11 +11,17 @@ typedef enum {
 } http_parse_e;
 
 typedef struct {
+    char key[256];
+    char value[512];
+} http_header_t;
+
+typedef struct {
     char method[HTTP_METHOD_MAX_LEN];
     char path[HTTP_PATH_MAX_LEN];
     char protocol[HTTP_PROTOCOL_MAX_LEN];
 } http_request;
 
 int read_http_request(int socket_fd, http_request *request);
+void parse_http_headers(const char *raw_request, http_request *request);
 
 #endif
