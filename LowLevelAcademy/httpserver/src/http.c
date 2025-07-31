@@ -1,15 +1,36 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "../include/http.h"
 
 void parse_http_headers(const char *raw_request, http_request *request) {
-    char buf[10] = {0};
-    const char *crlf = strstr(raw_request, "\r\n");
-    if (crlf) {
-        const char *line_start = crlf + 2;
-        strncpy(buf, line_start, 10);
-        printf("parsed %s\n", buf);
+    const char *p = strstr(raw_request, "\r\n");
+    if (!p) return;
+    p += 2;
+    int count = 0;
+    const char *q = p;
+    while (q && strncmp(q, "\r\n", 2) != 0 && *q) {
+        count++;
+        q = strstr(q, "\r\n");
+        if (q) q += 2;
+    }
+    if (count == 0) return;
+    request->headers = calloc(count, sizeof(http_header_t));
+    request->header_count = count;
+    for (int i = 0; i < count; i++) {
+        const char *next = strstr(p, "\r\n");
+        size_t len = next ? (size_t)(next - p) : strlen(p);
+        char line[768] = {0};
+        strncpy(line, p, len);
+        line[len] = '\0';
+        char *colon = strchr(line, ':');
+        if (colon) {
+            *colon = '\0';
+            strncpy(request->headers[i].key, line, sizeof(request->headers[i].key)-1);
+            strncpy(request->headers[i].value, colon+1, sizeof(request->headers[i].value)-1);
+        }
+        p = next ? next + 2 : NULL;
     }
 }
 

@@ -19,6 +19,8 @@ typedef struct {
     char method[HTTP_METHOD_MAX_LEN];
     char path[HTTP_PATH_MAX_LEN];
     char protocol[HTTP_PROTOCOL_MAX_LEN];
+    http_header_t *headers; // heap-allocated array
+    int header_count;
 } http_request;
 
 int read_http_request(int socket_fd, http_request *request);

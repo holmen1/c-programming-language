@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "../include/common.h"
 #include "../include/tcp.h"
 #include "../include/http.h"
@@ -17,6 +18,12 @@ void handle_client(int client_fd) {
     debug_log(req.method);
     debug_log(req.path);
     debug_log(req.protocol);
+
+    char header_buf[800];
+    for (int i = 0; i < req.header_count; ++i) {
+        snprintf(header_buf, sizeof(header_buf), "Key: %s Value: %s", req.headers[i].key, req.headers[i].value);
+        debug_log(header_buf);
+    }
 
     close(client_fd);
 }
