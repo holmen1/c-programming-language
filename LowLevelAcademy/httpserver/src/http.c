@@ -76,6 +76,15 @@ http_parse_e read_http_request(int socket_fd, http_request *request) {
     return HTTP_PARSE_OK;
 }
 
+void init_http_response(http_response *response) {
+    response->status_code = 200; // Default to OK
+    strncpy(response->reason_phrase, "OK", sizeof(response->reason_phrase) - 1);
+    response->headers = NULL;
+    response->header_count = 0;
+    response->body = NULL;
+    response->body_length = 0;
+}
+
 void free_http_headers(http_request *request) {
     free(request->headers);
     request->headers = NULL;
