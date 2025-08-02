@@ -8,7 +8,13 @@
 void handle_client(int client_fd) {
     http_request req = {0};
 
-    if (read_http_request(client_fd, &req) == -1) {
+    if (read_http_request(client_fd, &req) == HTTP_PARSE_INVALID) {
+        debug_log("Failed to read or parse HTTP request");
+        close(client_fd);
+        return;
+    }
+
+    if (parse_http_headers(req.buffer, &req) == HTTP_PARSE_INVALID) {
         debug_log("Failed to read or parse HTTP request");
         close(client_fd);
         return;
@@ -25,6 +31,7 @@ void handle_client(int client_fd) {
         debug_log(header_buf);
     }
 
+    free_http_headers(&req);
     close(client_fd);
 }
 
