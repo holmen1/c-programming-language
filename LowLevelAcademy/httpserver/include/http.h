@@ -42,6 +42,8 @@ typedef struct {
 http_parse_e read_http_request(int socket_fd, http_request *request);
 http_parse_e parse_http_headers(const char *raw_request, http_request *request);
 void init_http_response(http_response *response);
+void add_http_header(http_response *response, const char *key, const char *value);
 void free_http_headers(http_request *request);
+void free_http_response(http_response *response);
 
 #endif
