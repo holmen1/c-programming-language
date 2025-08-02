@@ -5,32 +5,37 @@
 #include "../include/http.h"
 
 void parse_http_headers(const char *raw_request, http_request *request) {
-    const char *p = strstr(raw_request, "\r\n");
-    if (!p) return;
-    p += 2;
-    int count = 0;
-    const char *q = p;
-    while (q && strncmp(q, "\r\n", 2) != 0 && *q) {
-        count++;
-        q = strstr(q, "\r\n");
-        if (q) q += 2;
-    }
-    if (count == 0) return;
-    request->headers = calloc(count, sizeof(http_header_t));
-    request->header_count = count;
-    for (int i = 0; i < count; i++) {
-        const char *next = strstr(p, "\r\n");
-        size_t len = next ? (size_t)(next - p) : strlen(p);
-        char line[768] = {0};
-        strncpy(line, p, len);
+    const char *line_start = strstr(raw_request, "\r\n");
+    if (!line_start) return;
+
+    line_start += 2;
+    while (line_start && *line_start && *line_start != '\r' && *line_start != '\n') {
+        const char *line_end = strstr(line_start, "\r\n");
+        if (!line_end) return;
+
+        size_t len = line_end - line_start;
+        char line[1024] = {0};
+        strncpy(line, line_start, len);
         line[len] = '\0';
+
         char *colon = strchr(line, ':');
         if (colon) {
             *colon = '\0';
-            strncpy(request->headers[i].key, line, sizeof(request->headers[i].key)-1);
-            strncpy(request->headers[i].value, colon+1, sizeof(request->headers[i].value)-1);
+            const char *key = line;
+            const char *value = colon + 1;
+            while (*value == ' ') value++; // Skip leading spaces
+            
+            request->headers = (http_header_t *)realloc(request->headers, (request->header_count + 1) * sizeof(http_header_t));
+            if (!request->headers) {
+                perror("Failed to allocate memory for headers");
+                exit(EXIT_FAILURE);
+            }
+            
+            strncpy(request->headers[request->header_count].key, key, sizeof(request->headers[request->header_count].key)-1);
+            strncpy(request->headers[request->header_count].value, value, sizeof(request->headers[request->header_count].value)-1);
+            request->header_count++;
         }
-        p = next ? next + 2 : NULL;
+        line_start = line_end + 2;
     }
 }
 

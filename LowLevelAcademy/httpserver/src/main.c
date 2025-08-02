@@ -21,7 +21,7 @@ void handle_client(int client_fd) {
 
     char header_buf[800];
     for (int i = 0; i < req.header_count; ++i) {
-        snprintf(header_buf, sizeof(header_buf), "Key: %s Value: %s", req.headers[i].key, req.headers[i].value);
+        snprintf(header_buf, sizeof(header_buf), "Key: %s\tValue: %s", req.headers[i].key, req.headers[i].value);
         debug_log(header_buf);
     }
 
