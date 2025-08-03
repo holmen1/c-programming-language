@@ -45,7 +45,9 @@ void init_http_response(http_response *response);
 void add_http_header(http_response *response, const char *key, const char *value);
 void set_http_body(http_response *response, const char *body);
 char *construct_http_response(const http_response *response, size_t *response_length);
+void serve_file(const char *path, http_response *response);
 void send_http_response(int client_fd, const http_response *response);
+void sanitize_path(const char *requested_path, char *sanitized_path, size_t buffer_size);
 void free_http_headers(http_request *request);
 void free_http_response(http_response *response);
 

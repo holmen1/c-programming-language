@@ -163,6 +163,54 @@ char *construct_http_response(const http_response *response, size_t *response_le
     return buffer;
 }
 
+void serve_file(const char *path, http_response *response) {
+    FILE *file = fopen(path, "rb");
+    if (!file) {
+        response->status_code = 404;
+        strncpy(response->reason_phrase, "Not Found", sizeof(response->reason_phrase) - 1);
+        file = fopen("./www/error.html", "rb");
+    }
+
+    // Determine the file size
+    fseek(file, 0, SEEK_END);
+    size_t file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    // Allocate memory for the file content
+    char *file_content = malloc(file_size + 1);
+    if (!file_content) {
+        perror("Failed to allocate memory for file content");
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    fread(file_content, 1, file_size, file);
+    fclose(file);
+    file_content[file_size] = '\0';
+
+    // Set the response body
+    response->body = file_content;
+    response->body_length = file_size;
+
+    // Determine content type (basic implementation)
+    if (strstr(path, ".html")) {
+        add_http_header(response, "Content-Type", "text/html");
+    } else if (strstr(path, ".css")) {
+        add_http_header(response, "Content-Type", "text/css");
+    } else if (strstr(path, ".js")) {
+        add_http_header(response, "Content-Type", "application/javascript");
+    } else if (strstr(path, ".png")) {
+        add_http_header(response, "Content-Type", "image/png");
+    } else {
+        add_http_header(response, "Content-Type", "application/octet-stream");
+    }
+
+    // Add content length header
+    char content_length[32];
+    snprintf(content_length, sizeof(content_length), "%zu", file_size);
+    add_http_header(response, "Content-Length", content_length);
+}
+
 void send_http_response(int client_fd, const http_response *response) {
     size_t response_length = 0;
     char *response_data = construct_http_response(response, &response_length);
@@ -178,6 +226,19 @@ void send_http_response(int client_fd, const http_response *response) {
     }
 
     free(response_data);
+}
+
+void sanitize_path(const char *requested_path, char *sanitized_path, size_t buffer_size) {
+    const char *web_root = "./www";
+    if (strcmp(requested_path, "/") == 0)
+        snprintf(sanitized_path, buffer_size, "%s/%s", web_root, "index.html");
+    else
+        snprintf(sanitized_path, buffer_size, "%s%s", web_root, requested_path);
+
+    // Prevent directory traversal by normalizing the path
+    if (strstr(sanitized_path, "..")) {
+        strncpy(sanitized_path, "./www/error.html", buffer_size - 1); // Serve a 404 page
+    }
 }
 
 void free_http_headers(http_request *request) {

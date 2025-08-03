@@ -6,7 +6,9 @@
 
 
 void handle_client(int client_fd) {
+    size_t buffer_size = 1024;
     http_request req = {0};
+    http_response res = {0};
 
     if (read_http_request(client_fd, &req) == HTTP_PARSE_INVALID) {
         debug_log("Failed to read or parse HTTP request");
@@ -20,29 +22,19 @@ void handle_client(int client_fd) {
         return;
     }
 
-    debug_log("HTTP request parsed successfully");
-    debug_log(req.method);
-    debug_log(req.path);
-    debug_log(req.protocol);
+    char sanitized_path[buffer_size];
+    sanitize_path(req.path, sanitized_path, buffer_size);
+    
 
-    char header_buf[800];
-    for (int i = 0; i < req.header_count; ++i) {
-        snprintf(header_buf, sizeof(header_buf), "Key: %s\tValue: %s", req.headers[i].key, req.headers[i].value);
-        debug_log(header_buf);
-    }
+    
+    init_http_response(&res);
+    serve_file(sanitized_path, &res);
+    send_http_response(client_fd, &res);
 
-    free_http_headers(&req);
-
-    http_response response;
-    init_http_response(&response);
-    add_http_header(&response, "Content-Type", "text/html");
-    add_http_header(&response, "Connection", "close");
-    set_http_body(&response, "<html><body><h1>Hello, world!</h1></body></html>");
-
-    send_http_response(client_fd, &response);
-
-    free_http_response(&response);
+    
     debug_log("Response sent and client connection closed");
+    free_http_headers(&req);
+    free_http_response(&res);
     close(client_fd);
 }
 
