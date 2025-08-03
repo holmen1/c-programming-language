@@ -32,6 +32,17 @@ void handle_client(int client_fd) {
     }
 
     free_http_headers(&req);
+
+    http_response response;
+    init_http_response(&response);
+    add_http_header(&response, "Content-Type", "text/html");
+    add_http_header(&response, "Connection", "close");
+    set_http_body(&response, "<html><body><h1>Hello, world!</h1></body></html>");
+
+    send_http_response(client_fd, &response);
+
+    free_http_response(&response);
+    debug_log("Response sent and client connection closed");
     close(client_fd);
 }
 
@@ -58,3 +69,20 @@ int main() {
     close(server.socket_fd);
     return 0;
 }
+
+/*
+$ ./bin/httpserver 
+Server bound and listening on port 8080
+DEBUG: Client connected
+DEBUG: HTTP request parsed successfully
+DEBUG: GET
+DEBUG: /
+DEBUG: HTTP/1.1
+DEBUG: Key: Host        Value: localhost:8080
+DEBUG: Key: User-Agent  Value: curl/8.14.1
+DEBUG: Key: Accept      Value: /
+DEBUG: Response sent and client connection closed
+
+$ curl localhost:8080
+<html><body><h1>Hello, world!</h1></body></html>
+*/
