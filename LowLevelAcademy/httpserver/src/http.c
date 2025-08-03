@@ -2,7 +2,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../include/http.h"
+//#include "../include/http.h" nvim lsp
+#include "http.h"
 
 http_parse_e parse_http_headers(const char *raw_request, http_request *request) {
     const char *line_start = strstr(raw_request, "\r\n");
@@ -96,6 +97,48 @@ void add_http_header(http_response *response, const char *key, const char *value
     strncpy(response->headers[response->header_count].value, value, sizeof(response->headers[response->header_count].value) - 1);
     response->headers[response->header_count].value[sizeof(response->headers[response->header_count].value) - 1] = '\0';
     response->header_count++;
+}
+
+char *construct_http_response(const http_response *response, size_t *response_length) {
+    size_t buffer_size = 1024;
+    char *buffer = malloc(buffer_size);
+    if (!buffer) {
+        perror("Failed to allocate memory for response buffer");
+        exit(EXIT_FAILURE);
+    }
+
+    size_t offset = snprintf(buffer, buffer_size, "HTTP/1.1 %d %s\r\n", response->status_code, response->reason_phrase);
+
+    for (size_t i = 0; i < response->header_count; i++) {
+        size_t header_length = snprintf(NULL, 0, "%s: %s\r\n", response->headers[i].key, response->headers[i].value);
+        while (offset + header_length + 1 > buffer_size) {
+            buffer_size *= 2;
+            buffer = realloc(buffer, buffer_size);
+            if (!buffer) {
+                perror("Failed to reallocate memory for response buffer");
+                exit(EXIT_FAILURE);
+            }
+        }
+        offset += snprintf(buffer + offset, buffer_size - offset, "%s: %s\r\n", response->headers[i].key, response->headers[i].value);
+    }
+
+    offset += snprintf(buffer + offset, buffer_size - offset, "\r\n");
+
+    if (response->body) {
+        while (offset + response->body_length + 1 > buffer_size) {
+            buffer_size *= 2;
+            buffer = realloc(buffer, buffer_size);
+            if (!buffer) {
+                perror("Failed to reallocate memory for response buffer");
+                exit(EXIT_FAILURE);
+            }
+        }
+        memcpy(buffer + offset, response->body, response->body_length);
+        offset += response->body_length;
+    }
+
+    *response_length = offset;
+    return buffer;
 }
 
 void free_http_headers(http_request *request) {

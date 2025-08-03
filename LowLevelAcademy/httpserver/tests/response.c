@@ -9,14 +9,29 @@ int main() {
     add_http_header(&response, "Content-Type", "text/html");
     add_http_header(&response, "Connection", "close");
 
-    printf("HTTP Response Headers:\n");
-    for (size_t i = 0; i < response.header_count; i++) {
-        printf("%s: %s\n", response.headers[i].key, response.headers[i].value);
-    }
+    response.body = "hello";
+    response.body_length = 5;
+
+    size_t response_length;
+    char *resp_string = construct_http_response(&response, &response_length);
+
+    printf("\n---RESPONSE START---\n");
+    fwrite(resp_string, 1, response_length, stdout);
+    printf("\n---RESPONSE END---\n");
 
     free_http_response(&response);
 
     return 0;
 }
 
-// $ gcc -I../include -o test_response response.c ../obj/http.o
+/*
+$ gcc -I../include -o test_response response.c ../obj/http.o
+$ ./test_response 
+
+---RESPONSE START---
+HTTP/1.1 200 OK          <- Status line
+Content-Type: text/html  <- Headers
+Connection: close        <- Headers
+                         <- Empty line (required HTTP delimiter)
+hello                    <- Body content
+---RESPONSE END---*/
