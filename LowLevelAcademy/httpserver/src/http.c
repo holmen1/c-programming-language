@@ -99,6 +99,27 @@ void add_http_header(http_response *response, const char *key, const char *value
     response->header_count++;
 }
 
+void set_http_body(http_response *response, const char *body) {
+    if (!body) {
+        return;
+    }
+    
+    size_t body_len = strlen(body);
+    
+    response->body = malloc(body_len);
+    if (!response->body) {
+        perror("Failed to allocate memory for response body");
+        exit(EXIT_FAILURE);
+    }
+    
+    memcpy(response->body, body, body_len);
+    response->body_length = body_len;
+
+    char length_str[32];
+    snprintf(length_str, sizeof(length_str), "%zu", body_len);
+    add_http_header(response, "Content-Length", length_str);
+}
+
 char *construct_http_response(const http_response *response, size_t *response_length) {
     size_t buffer_size = 1024;
     char *buffer = malloc(buffer_size);
@@ -151,5 +172,9 @@ void free_http_response(http_response *response) {
     free(response->headers);
     response->headers = NULL;
     response->header_count = 0;
+
+    free(response->body);
+    response->body = NULL;
+    response->body_length = 0;
 }
 

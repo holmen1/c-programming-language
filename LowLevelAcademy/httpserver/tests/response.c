@@ -8,9 +8,7 @@ int main() {
 
     add_http_header(&response, "Content-Type", "text/html");
     add_http_header(&response, "Connection", "close");
-
-    response.body = "hello";
-    response.body_length = 5;
+    set_http_body(&response, "hello");
 
     size_t response_length;
     char *resp_string = construct_http_response(&response, &response_length);
