@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
 //#include "../include/http.h" nvim lsp
 #include "http.h"
 
@@ -160,6 +161,23 @@ char *construct_http_response(const http_response *response, size_t *response_le
 
     *response_length = offset;
     return buffer;
+}
+
+void send_http_response(int client_fd, const http_response *response) {
+    size_t response_length = 0;
+    char *response_data = construct_http_response(response, &response_length);
+
+    size_t total_sent = 0;
+    while (total_sent < response_length) {
+        ssize_t bytes_sent = send(client_fd, response_data + total_sent, response_length - total_sent, 0);
+        if (bytes_sent <= 0) {
+            perror("Failed to send response");
+            break;
+        }
+        total_sent += bytes_sent;
+    }
+
+    free(response_data);
 }
 
 void free_http_headers(http_request *request) {
