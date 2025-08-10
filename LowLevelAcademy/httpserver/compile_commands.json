@@ -1,0 +1,18 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c99",
+      "-Wall",
+      "-Wextra",
+      "-Iinclude",
+      "-c",
+      "-o",
+      "obj/http.o",
+      "src/http.c"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/LowLevelAcademy/httpserver",
+    "file": "/home/holmen1/repos/c-programming-language/LowLevelAcademy/httpserver/src/http.c",
+    "output": "/home/holmen1/repos/c-programming-language/LowLevelAcademy/httpserver/obj/http.o"
+  }
+]

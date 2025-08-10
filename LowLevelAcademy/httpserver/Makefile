@@ -15,7 +15,7 @@ all: $(TARGET)
 $(TARGET): $(OBJECTS) | $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $@
 
-$(BINDIR)/main: $(MAIN_OBJ) $(OBJECTS) | $(BINDIR)
+$(BINDIR)/main: $(OBJECTS) | $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
