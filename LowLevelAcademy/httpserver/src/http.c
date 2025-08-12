@@ -1,5 +1,6 @@
 #include "http.h"
 #include "route.h"
+#include "common.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,7 @@ http_parse_e read_http_request(int socket_fd, http_request_raw *req) {
   }
 
   req->buffer[bytes_read] = '\0';
+  debug_log(req->buffer);
 
   // Create copy because strtok() modifies strings by inserting nulls; original
   // needed for header parsing
@@ -48,9 +50,10 @@ http_parse_e read_http_request(int socket_fd, http_request_raw *req) {
   return HTTP_PARSE_OK;
 }
 
-http_parse_e parse_http_headers(http_request_raw *raw_req,
+http_parse_e parse_http_request(http_request_raw *raw_req,
                                 http_request *req) {
 
+  // Request line
   strncpy(req->path, raw_req->path, sizeof(req->path) - 1);
   req->path[sizeof(req->path) - 1] = '\0';
 
@@ -62,10 +65,11 @@ http_parse_e parse_http_headers(http_request_raw *raw_req,
   } else if (strcmp(raw_req->method, "POST") == 0) {
     req->method = POST;
   } else {
-    // Unknown method, handle as needed (e.g., set to GET or error)
     return HTTP_PARSE_INVALID;
   }
 
+  // Headers
+  size_t content_length = 0;
   const char *line_start = strstr(raw_req->buffer, "\r\n");
   if (!line_start)
     return HTTP_PARSE_INVALID;
@@ -103,16 +107,31 @@ http_parse_e parse_http_headers(http_request_raw *raw_req,
       strncpy(req->headers[req->header_count].value, value,
               sizeof(req->headers[req->header_count].value) - 1);
       req->header_count++;
+
+      if (strcmp(key, "Content-Length") == 0) {
+        content_length = atoi(value);
+      }
     }
     line_start = line_end + 2;
   }
+
+  // Body
+  line_start += 2; // Skip the \r\n after headers
+
+  size_t body_len = strlen(line_start);
+
+  if (body_len && body_len == content_length) {
+    memcpy(req->body, line_start, body_len);
+    req->body[body_len] = '\0';
+  }
+
   return HTTP_PARSE_OK;
 }
 
 bool handle_request(http_request *req, http_response *res) {
     for (int i = 0; i < route_count; i++) {
         if (strcmp(routes[i].path, req->path) == 0 && routes[i].method == req->method) {
-            routes[i].handler(req, res);
+            routes[i].controller(req, res);
             return true;
         }
     }

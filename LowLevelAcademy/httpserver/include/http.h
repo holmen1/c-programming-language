@@ -37,7 +37,7 @@ typedef struct {
   char protocol[HTTP_PROTOCOL_MAX_LEN];
   http_header_t *headers; // heap-allocated array
   int header_count;
-  char buffer[HTTP_REQUEST_MAX_LEN];
+  char body[HTTP_REQUEST_MAX_LEN];
 } http_request;
 
 typedef struct {
@@ -51,7 +51,7 @@ typedef struct {
 } http_response;
 
 http_parse_e read_http_request(int socket_fd, http_request_raw *request);
-http_parse_e parse_http_headers(http_request_raw *raw_request, http_request *request);
+http_parse_e parse_http_request(http_request_raw *raw_request, http_request *request);
 void init_http_response(http_response *response);
 void add_http_header(http_response *response, const char *key,
                      const char *value);

@@ -17,7 +17,7 @@ void handle_client(int client_fd) {
     return;
   }
 
-  if (parse_http_headers(&req_raw, &req) == HTTP_PARSE_INVALID) {
+  if (parse_http_request(&req_raw, &req) == HTTP_PARSE_INVALID) {
     debug_log("Failed to parse HTTP request");
     close(client_fd);
     return;

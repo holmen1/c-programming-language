@@ -8,7 +8,7 @@
 typedef struct {
   http_method_e method;
   char path[128];
-  void (*handler)(http_request *, http_response *);
+  void (*controller)(http_request *, http_response *);
 } Route;
 
 size_t install_routes();
