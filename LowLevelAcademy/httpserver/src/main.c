@@ -5,6 +5,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cjson/cJSON.h>
+
+typedef struct {
+  int port;
+} server_config;
+
+int loadConfig(server_config *config) {
+  int status = 0;
+
+  char *configdata = loadfile("config.json");
+  if (!configdata) {
+    debug_log("Failed to load config, what happened?");
+  }
+
+  cJSON *config_json = cJSON_Parse(configdata);
+  if (config_json == NULL) {
+    const char *error_ptr = cJSON_GetErrorPtr();
+    if (error_ptr != NULL) {
+      fprintf(stderr, "Error before: %s\n", error_ptr);
+    }
+    status = 0;
+    goto end;
+  }
+
+  cJSON *port = cJSON_GetObjectItemCaseSensitive(config_json, "portnumber");
+  if (!cJSON_IsNumber(port)) {
+    status = 0;
+    goto end;
+  }
+
+  if (port->valueint > 65535 || port->valueint < 0) {
+    debug_log("Invalid port number specified in config.");
+    status = 0;
+    goto end;
+  }
+
+  config->port = (short)port->valueint;
+
+end:
+  cJSON_Delete(config_json);
+  return status;
+}
+
 void handle_client(int client_fd) {
   size_t buffer_size = 1024;
   http_request_raw req_raw = {0};
@@ -41,7 +84,16 @@ void handle_client(int client_fd) {
 
 int main() {
   tcp_server server = {0};
-  server_status_e status = bind_tcp_port(&server, 8080);
+
+  server_config config = {
+      .port = 8080,
+  };
+
+  if (loadConfig(&config) == 0) {
+    debug_log("failed to load config, using default values.");
+  }
+
+  server_status_e status = bind_tcp_port(&server, config.port);
   if (status != SERVER_OK) {
     debug_log("Server initialization failed");
     exit(EXIT_FAILURE);

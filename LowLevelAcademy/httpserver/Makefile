@@ -5,6 +5,8 @@ SRCDIR = src
 OBJDIR = obj
 BINDIR = bin
 
+LDFLAGS=-l:libcjson.a -L./lib
+
 TARGET = $(BINDIR)/httpserver
 
 SOURCES = $(wildcard $(SRCDIR)/*.c)
@@ -13,7 +15,7 @@ OBJECTS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS) | $(BINDIR)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(BINDIR)/main: $(OBJECTS) | $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
