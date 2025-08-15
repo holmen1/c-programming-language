@@ -1,0 +1,23 @@
+cabal-version:      3.12
+name:               matrix
+version:            0.1.0.0
+common warnings
+    ghc-options: -Wall
+
+executable haskell
+    import:           warnings
+    main-is:          Main.hs
+
+    -- Other library packages from which modules are imported.
+    build-depends:
+        base ^>=4.18.3.0,
+        random,
+        time,
+        deepseq
+
+    other-modules:    Matrix
+
+    -- Directories containing source files.
+    hs-source-dirs:   matrix
+
+    default-language: Haskell2010

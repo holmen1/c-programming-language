@@ -30,6 +30,7 @@
 **/bin/*
 
 cmake-build-debug/
+dist-newstyle/
 
 # IDE specific files
 #.vscode/

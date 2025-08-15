@@ -35,3 +35,5 @@ int main() {
 
     return 0;
 }
+
+//Matrix multiplication took 0.509 seconds
