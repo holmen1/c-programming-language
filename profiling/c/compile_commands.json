@@ -1,0 +1,32 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-std=c99",
+      "-Wall",
+      "-Wextra",
+      "-o",
+      "matrix",
+      "main.c"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/profiling/c",
+    "file": "/home/holmen1/repos/c-programming-language/profiling/c/main.c",
+    "output": "/home/holmen1/repos/c-programming-language/profiling/c/matrix"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-std=c99",
+      "-Wall",
+      "-Wextra",
+      "-o",
+      "matrix",
+      "matrix.c"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/profiling/c",
+    "file": "/home/holmen1/repos/c-programming-language/profiling/c/matrix.c",
+    "output": "/home/holmen1/repos/c-programming-language/profiling/c/matrix"
+  }
+]
