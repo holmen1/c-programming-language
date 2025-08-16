@@ -20,6 +20,8 @@ executable mmul
     main-is:          Main.hs
     build-depends:
         base ^>=4.18.3.0,
+        vector,
+        time,
         mmul
     hs-source-dirs:   app
     default-language: Haskell2010
