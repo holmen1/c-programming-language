@@ -29,3 +29,9 @@ $ curl http://localhost:8080 -v --output -
 </body>
 </html>
 * Connection #0 to host localhost left intact
+
+
+```
+curl -X POST http://localhost:1337/reverse -d "text=yourtext"
+txetruoy=txet
+```

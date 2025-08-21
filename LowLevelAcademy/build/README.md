@@ -1,17 +1,20 @@
 ```
+git clone https://github.com/DaveGamble/cJSON.git
+```
+
+```
 make all
 ```
 
+
 ```
-# copy static library
-mkdir lib
-cp ../build/cJSON/libcjson.a lib/
+# copy static library to make server portable if target do not have cJSON installed
+mkdir -p ../../httpserver/lib
+cp libcjson.a ../../httpserver/lib/
 ```
 
 
-
-
-
+For development
 ```
 $ sudo make install
 mkdir -p /usr/local/lib /usr/local/include/cjson
