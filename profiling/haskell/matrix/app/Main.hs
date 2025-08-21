@@ -18,8 +18,8 @@ genB rows cols = Matrix rows cols $ U.generate (rows * cols) $ \ix ->
 main :: IO ()
 main = do
   let aRows = 300
-      aCols = 1000
-      bRows = 1000
+      aCols = 10000
+      bRows = 10000
       bCols = 400
 
   putStrLn "Generating matrices..."
