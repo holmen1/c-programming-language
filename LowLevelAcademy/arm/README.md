@@ -51,14 +51,15 @@ Inside GDB, connect to QEMU
 ```
 
 Common GDB Commands
-- `b _start`   Set breakpoint at program start
-- `b n`        Set breakpoint at line n
-- `n`          Go to next instruction
-- `s`          Go to next instruction, diving into function
-- `c`          Run until next breakpoint
-- `x/10i $pc`  Show next 10 instructions from program counter
-- `q`          Exit GDB
-- `fs next`    Focus on next window
+- `b _start`        Set breakpoint at program start
+- `b n`             Set breakpoint at line n
+- `n`               Go to next instruction
+- `s`               Go to next instruction, diving into function
+- `c`               Run until next breakpoint
+- `x/10i $pc`       Show next 10 instructions from program counter
+- `x/4xb 0xaddress` Show 4 bytes in hexadecimal format
+- `q`               Exit GDB
+- `fs next`         Focus on next window
 
 
 ## Further Resources
