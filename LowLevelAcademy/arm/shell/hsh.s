@@ -4,6 +4,7 @@
 _start:
     bl print_prompt
     bl read_cmd
+    bl print_result
     b exit_ok
 
 
@@ -23,6 +24,18 @@ read_cmd:
     svc #0
 
     ldr r0, =input_buf 
+    pop {pc}
+
+print_result:               // prints first 2 chars + newline
+    push {lr}
+    mov r1, r0              // buffer
+    mov r0, #'\n'           // load newline character
+    strb r0, [r1, #2]       // store newline at [buffer+3]
+
+    mov r7, #4              // syscall: write
+    mov r0, #1              // fd: stdout
+    mov r2, #3              // count: 3 bytes
+    svc #0
     pop {pc}
 
 printf:
