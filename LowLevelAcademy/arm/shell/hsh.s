@@ -3,6 +3,7 @@
 .text
 _start:
     bl print_prompt
+    bl read_cmd
     b exit_ok
 
 
@@ -11,6 +12,17 @@ print_prompt:
     ldr r0, =my_prompt
     ldr r1, =prompt_len
     bl printf
+    pop {pc}
+
+read_cmd:
+    push {lr}
+    mov r7, #3      // syscall: read
+    mov r0, #0      // fd: stdin
+    ldr r1, =input_buf 
+    mov r2, #buffer_len     // count
+    svc #0
+
+    ldr r0, =input_buf 
     pop {pc}
 
 printf:
@@ -32,3 +44,10 @@ exit_ok:
 my_prompt:
     .asciz "> "
 prompt_len = . - my_prompt
+
+.equ buffer_len, 16    // 15 chars + null terminator
+
+.bss
+    .align 2
+input_buf:
+    .skip buffer_len   // Reserve 16 bytes for input_buf, all initialized to zero
