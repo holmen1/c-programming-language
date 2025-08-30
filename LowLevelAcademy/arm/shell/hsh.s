@@ -2,11 +2,12 @@
 
 .text
 _start:
+main_loop:
     bl print_prompt
     bl read_cmd
+    bl check_exit
     bl print_result
-    b exit_ok
-
+    b main_loop
 
 print_prompt:
     push {lr}
@@ -28,14 +29,10 @@ read_cmd:
 
 print_result:               // prints first 2 chars + newline
     push {lr}
-    mov r1, r0              // buffer
-    mov r0, #'\n'           // load newline character
-    strb r0, [r1, #2]       // store newline at [buffer+3]
-
-    mov r7, #4              // syscall: write
-    mov r0, #1              // fd: stdout
-    mov r2, #3              // count: 3 bytes
-    svc #0
+    mov r2, #'\n'           // load newline character
+    strb r2, [r0, #2]       // store newline at [buffer+2]
+    mov r1, #3              // count: 3 bytes
+    bl printf
     pop {pc}
 
 printf:
@@ -52,6 +49,19 @@ exit_ok:
     mov r7, #1
     mov r0, #0
     svc #0
+
+check_exit:
+    push {lr}
+    ldrb r2, [r0]        // first char
+    cmp r2, #'q'
+    bne return
+    ldrb r2, [r0, #1]
+    cmp r2, #10          // newline (ASCII 10)
+    bne return
+    b exit_ok            // input is "q\n", so exit shell
+
+return:
+    pop {pc}
 
 .data
 my_prompt:
