@@ -23,7 +23,7 @@ _start:
     mov r7, #4              // syscall: write
     mov r0, #1              // fd: stdout
     mov r1, sp              // buffer: stack pointer
-    mov r2, #2             // count: 1 byte
+    mov r2, #2             // count: 2 bytes
     svc #0
 
     add sp, sp, #4          // deallocate stack space

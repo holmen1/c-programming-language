@@ -9,7 +9,7 @@ _start:
     svc #0
 
     mov r7, #1
-    mov r1, #0
+    mov r0, #0
     svc #0
 
 .data
