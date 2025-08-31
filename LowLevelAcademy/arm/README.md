@@ -31,6 +31,9 @@ This two-step process gives you the same executable file as the gcc command but 
 ```bash
 qemu-arm ./hello
 ```
+```bash
+qemu-arm -strace ./hello
+```
 
 ### Debug
 For Linux binaries (user-mode)

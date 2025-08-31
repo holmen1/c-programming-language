@@ -67,11 +67,15 @@ exec_cmd:
     bl wait_for_child
 child_process:
     push {lr}
-    mov r7, #11         // sys_execveq
+    mov r7, #11         // sys_execve
     ldr r0, =buffer
-    mov r1, #0        // argv
+    ldr r1, =argv
     mov r2, #0          // envp
     svc #0
+    // If execve fails, r0 will be negative
+    cmp r0, #0
+    blt exit_error  // Branch to error exit if failed
+    pop {pc}        // This won't run if execve succeeds
 wait_for_child:
     mov r7, #0x72        // sys_wait4
     mov r0, #-1          // Wait for any child
@@ -101,6 +105,11 @@ exit_ok:
     mov r0, #0
     svc #0
 
+exit_error:
+    mov r7, #1      // sys_exit
+    mov r0, #1      // Exit code 1 (error)
+    svc #0
+
 check_exit:
     push {lr}
     ldrb r2, [r0]        // first char
@@ -127,6 +136,10 @@ my_path:
     .ascii "/usr/bin/"
 path_len = . - my_path
 
+argv:
+    .word buffer  // Pointer to the command path
+    .word 0       // NULL terminator
+
 .equ buffer_len, 16    // 15 chars + null terminator
 
 .bss
@@ -135,3 +148,35 @@ input_buf:
     .skip buffer_len   // Reserve 16 bytes for input_buf, all initialized to zero
 buffer:
     .skip buffer_len   // Reserve 16 bytes for buf, all initialized to zero
+
+
+
+@ $ ./hsh 
+@ Welcome to holmshell!
+@ Exit with 'q'
+@ > ls
+@ hsh  hsh.s
+@ > ps
+@     PID TTY          TIME CMD
+@   15297 pts/4    00:00:00 bash
+@   28795 pts/4    00:00:00 hsh
+@   28832 pts/4    00:00:00 ps
+@ > whoami
+@ holmen1
+@ > q
+@ $ echo $?
+@ 0
+
+@ $ qemu-arm -strace ./hsh 
+@ 29036 write(1,0x20247,37)Welcome to holmshell!
+@ Exit with 'q'
+@  = 37
+@ 29036 write(1,0x20244,3)>  = 3
+@ 29036 read(0,0x20280,16)ls
+@  = 3
+@ 29036 fork() = 29071
+@ 29036 wait4(-1,(nil),0,0x9) = 0
+@ 29071 execve("/usr/bin/ls",{"/usr/bin/ls",NULL})hsh  hsh.s
+@  = -1 errno=14 (Bad address)
+@ 29036 write(1,0x20244,3)>  = 3
+@ 29036 read(0,0x20280,16)
