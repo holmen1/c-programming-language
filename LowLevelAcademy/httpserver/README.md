@@ -29,6 +29,29 @@ cp -a cJSON_Utils.h /usr/local/include/cjson
 cp -a libcjson_utils.so libcjson_utils.so.1 libcjson_utils.so.1.7.18 /usr/local/lib
 ```
 
+### FreeBSD patch
+
+**Background**: On FreeBSD, the standard C library functions `isnan()` and `isinf()` may not be available or behave incorrectly during compilation of cJSON, causing build failures. The patch modifies `cJSON.c` line 607 to use GCC/Clang built-in functions (`__builtin_isnan` and `__builtin_isinf`) when available, providing better portability across BSD systems.
+
+**How to apply**:
+
+From the `build/` directory after cloning cJSON:
+```bash
+cd build/cJSON
+patch -p4 < ../cjson_freebsd.patch
+```
+
+Or from the repository root:
+```bash
+c-programming-language $ patch -p1 < ./LowLevelAcademy/httpserver/build/cjson_freebsd.patch
+```
+
+Test with 
+```bash
+patch --dry-run -p1 < cjson_freebsd.patch
+```
+ to verify
+
 ## Build
 In ```httpserver```
 ```
