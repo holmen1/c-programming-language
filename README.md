@@ -53,3 +53,37 @@ bear -- make
 ```
 
 Once generated, place `compile_commands.json` in your project root. Most LSP clients will automatically detect and use it for improved development experience in Neovim and other editors.
+
+
+## Lessons Learned
+
+### Header Ordering in C Network Programming
+
+When compiling socket code across platforms (Linux, FreeBSD, macOS), **header include order matters**. 
+
+#### The Problem
+```c
+// This works on Linux but fails on FreeBSD: 
+#include <arpa/inet.h>
+#include <unistd.h>
+```
+**Error**: `field 'address' has incomplete type` for `struct sockaddr_in`
+
+#### The Solution
+Follow the POSIX-standard order for network headers: 
+```c
+#include <sys/types.h>    // 1. Basic types (socklen_t, size_t)
+#include <sys/socket. h>   // 2. Socket API (socket, bind, accept)
+#include <netinet/in.h>   // 3. Internet structures (sockaddr_in)
+#include <arpa/inet.h>    // 4. Internet operations (htons, inet_ntoa)
+#include <unistd.h>       // 5. POSIX functions (close, read, write)
+```
+
+#### Why It Matters
+- **Linux is lenient**:  Implicitly includes dependencies
+- **FreeBSD is strict**: Follows POSIX standards exactly  
+- **Portable code**:  Explicit includes work everywhere
+
+**Rule of thumb**: If it compiles on FreeBSD, it will compile on Linux.  The reverse isn't always true. 
+
+**Pro tip**: Check `man` pages for required headers:  `man 2 socket` shows which headers to include.
