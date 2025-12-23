@@ -1,22 +1,69 @@
-$ curl http://localhost:8080 -v --output -
-* Host localhost:8080 was resolved.
+# httpserver
+
+## Build json parser
+```
+mkdir build && cd build
+git clone https://github.com/DaveGamble/cJSON.git
+```
+
+```
+cd cJSON
+make all
+```
+
+
+```
+# copy static library to make server portable if target do not have cJSON installed
+mkdir -p ../../lib
+cp libcjson.a ../../lib/
+```
+
+
+For development
+```
+$ sudo make install
+mkdir -p /usr/local/lib /usr/local/include/cjson
+cp -a cJSON.h /usr/local/include/cjson
+cp -a libcjson.so libcjson.so.1 libcjson.so.1.7.18 /usr/local/lib
+cp -a cJSON_Utils.h /usr/local/include/cjson
+cp -a libcjson_utils.so libcjson_utils.so.1 libcjson_utils.so.1.7.18 /usr/local/lib
+```
+
+## Build
+In ```httpserver```
+```
+make all
+```
+
+## Usage
+
+```
+./bin/httpserver
+```
+curl http://localhost:3737 -v --output -: Sends a GET request to http://localhost:3737 (the running server on port 3737).  
+-v: Enables verbose output, showing connection details, headers, and response.  
+--output -: Outputs the response body to stdout (the terminal).
+
+```bash
+curl localhost:1337 -v --output -
+* Host localhost:1337 was resolved.
 * IPv6: ::1
 * IPv4: 127.0.0.1
-*   Trying [::1]:8080...
-* connect to ::1 port 8080 from ::1 port 35046 failed: Connection refused
-*   Trying 127.0.0.1:8080...
-* Connected to localhost (127.0.0.1) port 8080
+*   Trying [::1]:1337...
+* connect to ::1 port 1337 from ::1 port 53922 failed: Connection refused
+*   Trying 127.0.0.1:1337...
+* Established connection to localhost (127.0.0.1 port 1337) from 127.0.0.1 port 50340
 * using HTTP/1.x
 > GET / HTTP/1.1
-> Host: localhost:8080
-> User-Agent: curl/8.15.0
+> Host: localhost:1337
+> User-Agent: curl/8.17.0
 > Accept: */*
-> 
+>
 * Request completely sent off
 < HTTP/1.1 200 OK
 < Content-Type: text/html
-< Content-Length: 205
-< 
+< Content-Length: 380
+<
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,11 +71,17 @@ $ curl http://localhost:8080 -v --output -
     <title>Welcome</title>
 </head>
 <body>
-    <h1>Welcome to the Toy HTTP Server!</h1>
+    <h1>Welcome to Toy HTTP Server!</h1>
     <p>This is the index page.</p>
+
+    <form action="/reverse" method="post">
+        <input type="text" name="text" placeholder="Enter text to reverse">
+        <button type="submit">Reverse</button>
+    </form>
 </body>
 </html>
-* Connection #0 to host localhost left intact
+* Connection #0 to host localhost:1337 left intact
+```
 
 
 ```
