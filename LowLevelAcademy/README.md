@@ -33,9 +33,3 @@ $ pacman -S gnu-netcat strace
 ```
 
 These projects demonstrate foundational systems programming concepts including memory management, binary protocols, file I/O, networking, and multithreading.
-
-
-
-
-
-
