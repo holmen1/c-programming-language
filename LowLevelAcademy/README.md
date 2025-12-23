@@ -26,6 +26,14 @@ A minimal POSIX threadpool implementation:
 - Demonstrates thread synchronization and concurrency
 - Simple Makefile for building and running
 
+### [HTTP Server](httpserver/README.md)
+A simple HTTP server implementation with JSON support:
+- TCP socket-based HTTP/1.1 server
+- JSON parsing using cJSON library
+- GET and POST request handling
+- Static file serving and form processing
+- FreeBSD compatibility patches included
+
 ## Prerequisites
 
 ```bash
