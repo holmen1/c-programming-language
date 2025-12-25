@@ -1,5 +1,55 @@
 # arm
 
+Learning ARMv7 (32-bit) assembly programming with Linux syscalls
+
+
+## Programs
+
+### simple.s
+The simplest runnable ARM program - exits with status code 0 using the `exit` syscall. Demonstrates the minimal structure needed for an executable.
+
+### hello.s
+Classic "Hello, World!" program that writes a message to stdout using the `write` syscall, then exits cleanly.
+
+### loop.s
+Calculates the sum of numbers 0 to 15 using a loop with conditional branching. Exits with the sum (120) as the exit code.
+
+### toupper.s
+Interactive program that reads one character from stdin, converts it to uppercase if it's a lowercase letter, and writes it back to stdout with a newline. Demonstrates stack allocation and function calls.
+
+### holmshell
+
+A minimal command shell implementation in ARM assembly that demonstrates process management through Linux syscalls. The shell reads user commands, constructs full paths by prepending `/usr/bin/`, forks a child process, and executes commands using `execve`. It uses `fork`, `wait4`, `read`, and `write` syscalls directly without any C library dependencies.
+
+**Key features:**
+- Interactive prompt with command input
+- Process forking and execution
+- Parent process waits for child completion
+- Direct syscall interface (no libc)
+- Simple exit handling
+
+**Example usage:**
+```bash
+$ arm-none-eabi-gcc -o hsh holmshell.s -nostdlib -static
+$ qemu-arm ./hsh
+Welcome to holmshell!
+Exit with 'q'
+> ls
+README.md  hello.s  holmshell.s  hsh  loop.s  simple.s  toupper.s
+> whoami
+holmen1
+> ps
+    PID TTY          TIME CMD
+   1682 pts/0    00:00:00 bash
+ 548639 pts/0    00:00:00 qemu-arm
+ 548647 pts/0    00:00:00 ps
+> q
+$ echo $?
+0
+```
+
+
+
 ## ARM Assembly Development Environment
 This guide provides instructions for setting up a development environment for ARMv7 (32-bit)
 
@@ -8,11 +58,11 @@ Install the necessary tools: the ARM cross-compiler toolchain and the QEMU emula
 
 ### Arch Linux (AMD64)
 
-**Bare-metal toolchain (for assembly with -nostdlib):**
+**Bare-metal style toolchain (for assembly with Linux syscalls):**
 ```bash
 sudo pacman -S arm-none-eabi-gcc arm-none-eabi-binutils qemu-user qemu-user-static gdb
 ```
-This is sufficient for bare-metal assembly programs that don't use the C standard library.
+This compiles assembly programs that make direct Linux syscalls (not truly bare-metal, but no C library).
 
 ## Workflow
 
@@ -35,8 +85,13 @@ arm-none-eabi-ld -o hello hello.o
 ```bash
 qemu-arm ./hello
 ```
+
+Trace system calls and signals
 ```bash
-qemu-arm -strace ./hello
+% qemu-arm -strace ./hello
+548733 write(1,0x9024,14)Hello, World!
+ = 14
+548733 exit(0)
 ```
 
 ### Debug

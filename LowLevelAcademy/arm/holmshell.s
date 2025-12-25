@@ -127,6 +127,9 @@ return:
 my_prompt:
     .asciz "> "
 prompt_len = . - my_prompt
+// my_prompt    address of the prompt string
+// .            is the location counter (current address/position in the program)
+// . - my_prompt calculates the length of data by subtracting startaddress from current address
 
 my_welcome_msg:
     .asciz "Welcome to holmshell!\nExit with 'q'\n"
@@ -134,7 +137,7 @@ welcome_msg_len = . - my_welcome_msg
 
 my_path:
     .ascii "/usr/bin/"
-path_len = . - my_path
+path_len = . - my_path  //
 
 argv:
     .word buffer  // Pointer to the command path
@@ -142,12 +145,13 @@ argv:
 
 .equ buffer_len, 16    // 15 chars + null terminator
 
+// uninitialized data
 .bss
-    .align 2
+    .align 2            // Align to 4-byte boundary (2^2 = 4)
 input_buf:
-    .skip buffer_len   // Reserve 16 bytes for input_buf, all initialized to zero
+    .skip buffer_len    // Reserve 16 bytes (uninitialized, zero-filled by OS at runtime)
 buffer:
-    .skip buffer_len   // Reserve 16 bytes for buf, all initialized to zero
+    .skip buffer_len    // Reserve 16 bytes (uninitialized, zero-filled by OS at runtime)
 
 
 
