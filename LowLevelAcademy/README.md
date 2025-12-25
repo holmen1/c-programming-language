@@ -5,6 +5,13 @@ A collection of C programming projects focused on systems programming and low-le
 
 ## Projects
 
+### [ARM Assembly](arm/README.md)
+Learning ARMv7 assembly programming with direct Linux syscalls:
+- Basic programs (hello world, loops, I/O)
+- Interactive shell implementation (holmshell)
+- Process management with fork/execve
+- No C library dependencies - pure syscalls
+
 ### [Database System](database/README.md)
 A custom binary database implementation with:
 - CRUD operations for employee records
