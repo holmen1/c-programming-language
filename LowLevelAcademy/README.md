@@ -33,13 +33,8 @@ A minimal POSIX threadpool implementation:
 - Demonstrates thread synchronization and concurrency
 - Simple Makefile for building and running
 
-## Prerequisites
 
-```bash
-$ pacman -S gnu-netcat strace
-```
-
-These projects demonstrate foundational systems programming concepts including memory management, binary protocols, file I/O, networking, and multithreading.
+These projects demonstrate foundational systems programming concepts including assembly programming, direct syscalls, memory management, binary protocols, file I/O, networking, and multithreading.
 
 
 
