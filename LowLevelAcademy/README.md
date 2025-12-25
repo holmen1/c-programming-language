@@ -41,10 +41,5 @@ A simple HTTP server implementation with JSON support:
 - Static file serving and form processing
 - FreeBSD compatibility patches included
 
-## Prerequisites
 
-```bash
-$ pacman -S gnu-netcat strace
-```
-
-These projects demonstrate foundational systems programming concepts including memory management, binary protocols, file I/O, networking, and multithreading.
+These projects demonstrate fundamental systems programming concepts including assembly programming, HTTP servers, network protocols, concurrency, memory management, and low-level system interfaces. 
