@@ -40,7 +40,7 @@ q                 # Exit GDB
 
 ## K&R Exercises
 
-[Exercises](Exercices/EXERCISES.md)
+[Exercises](EXERCISES.md)
 
 
 ## LSP
