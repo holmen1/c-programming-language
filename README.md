@@ -38,6 +38,11 @@ fs next           # Focus on next window
 q                 # Exit GDB
 ```
 
+## K&R Exercises
+
+[Exercises](Exercices/EXERCISES.md)
+
+
 ## LSP
 
 For advanced code navigation, auto-completion, and diagnostics in editors like Neovim (using plugins such as nvim-lspconfig or clangd), a `compile_commands.json` file is essential. This file provides the LSP with accurate build information, including include paths, compiler flags, and source files, enabling precise parsing and analysis of your C/C++ codebase.
