@@ -18,12 +18,12 @@ int main(void) {
   print_binary(getbits(y, 6, 4));
 
   /* setbits */
-  printf("\n- setbits:  set 3 rightmost bits of y from position 4\n");
-  printf("setbits(x,4,3,y)=\t");
-  print_binary(setbits(x, 4, 3, y));
+  printf("\n- setbits:  set 3 rightmost bits of y from position 15\n");
+  printf("setbits(x,15,3,y)=\t");
+  print_binary(setbits(x, 15, 3, y));
 
   /* invert */
-  printf("\n- invert:  invert 3 rightmost bits of y from position 7\n");
+  printf("\n- invert:  invert 3 rightmost bits of x from position 7\n");
   printf("invert(x,7,3)=\t");
   print_binary(invert(x, 7, 3));
 
