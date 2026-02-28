@@ -63,3 +63,25 @@ bitcount2 time: 0.287147 seconds
 bitcount3 time: 0.097398 seconds
 ```
 
+**Optimazation effect**
+```bash
+$ gcc -Wall -O0 main.c bits.c binprint.c bitcount.c
+$ ./a.out
+
+executions: 100000000
+bitcount time:  4.516744 seconds
+bitcount2 time: 0.574642 seconds
+bitcount3 time: 0.230350 seconds
+```
+
+Optimization effect (-O0 → -O2):
+- bitcount:  4.52s → 1.12s  (~4.0x speedup) — largest gain; the compiler can aggressively
+  unroll and simplify the shift-and-test loop since it has no inter-iteration dependencies
+  other than the counter.
+- bitcount2: 0.57s → 0.29s  (~2.0x speedup) — moderate gain; the `x &= (x-1)` loop has
+  a strict data dependency (each iteration depends on the previous x), limiting instruction-
+  level parallelism and preventing unrolling.
+- bitcount3: 0.23s → 0.10s  (~2.4x speedup) — also moderate; the four table lookups are
+  already independent and fast, but the compiler still benefits from better register
+  allocation and inlining.
+
