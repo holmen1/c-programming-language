@@ -11,6 +11,17 @@ unsigned setbits(unsigned x, int p, int n, unsigned y) {
   return (x & ~(mask << shift)) | getbits(y, n - 1, n) << shift;
 }
 
+/* setbits: explained */
+unsigned setbits_steps(unsigned x, int p, int n, unsigned y) {
+  /* n rightmost 1s */
+  unsigned mask = ~(~0 << n);
+  /* clear n bits from position p in x */
+  x = x & ~(mask << (p + 1 - n));
+  /* first n y bits shifted to p to fit x above */
+  y = (y & mask) << (p + 1 - n);
+  return x | y;
+}
+
 /* invert:  invert n rightmost bits from position p */
 unsigned invert(unsigned x, int p, int n) {
   int splice = getbits(x, p, n);
