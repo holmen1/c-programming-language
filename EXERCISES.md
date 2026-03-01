@@ -1,5 +1,7 @@
 # Exercises
 
+## Types, Operators and Expressions
+
 ### 2.9 Bitwise Operators
 
 #### Exercise 2-6
@@ -85,3 +87,22 @@ Optimization effect (-O0 → -O2):
   already independent and fast, but the compiler still benefits from better register
   allocation and inlining.
 
+## Control Flow
+
+### Exercise 3-3
+
+Write a function [expand(s1,s2)](3_Control_Flow/expand.c) that expands shorthand notations
+like `a-z` in the string `s1` into the equivalent complete list `abc...xyz` in `s2`.
+Allow for letters of either case and digits, and be prepared to handle cases like `a-b-c`
+and `a-z0-9` and `-a-z`. Arrange that a leading or trailing `-` is taken litterally.
+```bash
+$ ./a.out
+expand '-a-z1-5-': -abcdefghijklmnopqrstuvwxyz12345-
+expand 'A-Z': ABCDEFGHIJKLMNOPQRSTUVWXYZ
+expand '0-9': 0123456789
+expand 'a-b-c': error: 'a-b-c' is not valid
+expand 'a-B': error: 'a-B' is not valid
+expand '9-0': error: '9-0' is not valid
+$ echo $?
+1
+```
