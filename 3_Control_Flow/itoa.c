@@ -5,10 +5,11 @@
 
 static void itoa(int n, char s[]);
 static void itoa2(int n, char s[]);
+static void itob(int n, char s[], int b);
 
 int main(void) {
   char s[64];
-  int tests[] = {32, -64, 128, INT_MAX, INT_MIN };
+  int tests[] = {32, -64, 128, INT_MAX, INT_MIN};
 
   printf("Word size: %d bits\n", (int)sizeof(long) * CHAR_BIT);
   printf("int size: %zu bits\n", sizeof(int) * CHAR_BIT);
@@ -27,6 +28,12 @@ int main(void) {
     printf("%d -> %s\n", tests[i], s);
   }
 
+  printf("\nTesting itoab:\n");
+  for (int i = 0; i < 5; i++) {
+    itob(tests[i], s, 16);
+    printf("%d -> %s\n", tests[i], s);
+  }
+
   return 0;
 }
 
@@ -38,6 +45,22 @@ static void reverse(char s[]) {
     c = s[i];
     s[i] = s[j];
     s[j] = c;
+  }
+}
+
+char itoh(int n) {
+  if (n < 10)
+    return n + '0';
+  switch (n) {
+  case 10:
+  case 11:
+  case 12:
+  case 13:
+  case 14:
+  case 15:
+    return 'a' + n - 10;
+  default:
+    return '?';
   }
 }
 
@@ -69,6 +92,27 @@ void itoa2(int n, char s[]) {
   do
     s[i++] = abs(n % 10) + '0';
   while ((n /= 10) != 0);
+
+  if (sign < 0)
+    s[i++] = '-';
+  s[i] = '\0';
+
+  return reverse(s);
+}
+
+void itob(int n, char s[], int b) {
+  int i, sign, c;
+
+  sign = n;
+
+  i = 0;
+  do {
+    if (b == 16)
+      c = itoh(abs(n % 16));
+    else
+      c = abs(n % b) + '0';
+    s[i++] = c;
+  } while ((n /= b) != 0);
 
   if (sign < 0)
     s[i++] = '-';

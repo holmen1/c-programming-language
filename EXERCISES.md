@@ -121,7 +121,7 @@ on which it runs.
 
 **Why it fails:** `itoa` uses `n = -n` to make the number positive before extracting digits.
 For `INT_MIN` ($-2^{31}$ on a 32-bit `int`), the negation overflows because two's complement
-is asymmetric: $|INT\_MIN| = 2^{31}$ which exceeds $INT\_MAX = 2^{31}-1$.
+is asymmetric: `|INT_MIN|` = $2^{31}$ which exceeds `INT_MAX` = $2^{31}-1$.
 `-INT_MIN` overflows back to `INT_MIN` (undefined behavior). In practice this causes
 `n % 10` to yield `-8`, and `-8 + '0'` produces `'('` (ASCII 40),
 giving the output `-(` instead of `-2147483648`.
@@ -150,4 +150,12 @@ Testing itoa2:
 2147483647 -> 2147483647
 -2147483648 -> -2147483648
 ```
+
+#### Exercise 3-3
+
+Write the function `itob(n,s,b)` that converts the integer n into a base b
+character representation in the string s. In particular, `itob(n,s,16)`
+formats n as a hexadecimal digit in s.
+
+
 
