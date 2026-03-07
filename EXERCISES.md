@@ -89,7 +89,9 @@ Optimization effect (-O0 → -O2):
 
 ## Control Flow
 
-### Exercise 3-3
+### 3.5 Loops -- While and For
+
+#### Exercise 3-3
 
 Write a function [expand(s1,s2)](3_Control_Flow/expand.c) that expands shorthand notations
 like `a-z` in the string `s1` into the equivalent complete list `abc...xyz` in `s2`.
@@ -106,3 +108,46 @@ expand '9-0': error: '9-0' is not valid
 $ echo $?
 1
 ```
+
+### 3.5 Loops -- Do-while
+
+#### Exercise 3-4
+
+In a two's complement number representation,
+our version of [itoa](3_Control_Flow/itoa.c) does not handle the
+largest negative number, that is, the value of `n` equal to $-(2^{wordsize - 1})$.
+Explain why not. Modify it to print that value correctly, regardless of the machine
+on which it runs.
+
+**Why it fails:** `itoa` uses `n = -n` to make the number positive before extracting digits.
+For `INT_MIN` ($-2^{31}$ on a 32-bit `int`), the negation overflows because two's complement
+is asymmetric: $|INT\_MIN| = 2^{31}$ which exceeds $INT\_MAX = 2^{31}-1$.
+`-INT_MIN` overflows back to `INT_MIN` (undefined behavior). In practice this causes
+`n % 10` to yield `-8`, and `-8 + '0'` produces `'('` (ASCII 40),
+giving the output `-(` instead of `-2147483648`.
+
+**Fix (`itoa2`):** Never negate `n`. Instead, extract digits with `abs(n % 10)` directly on
+the negative value — `%` on a negative number gives a negative remainder in C, so `abs()`
+corrects it. The sign is appended at the end as before. No overflow possible.
+
+```bash
+Word size: 64 bits
+int size: 32 bits
+INT_MAX: 2147483647
+INT_MIN: -2147483648
+
+Testing itoa:
+32 -> 32
+-64 -> -64
+128 -> 128
+2147483647 -> 2147483647
+-2147483648 -> -(
+
+Testing itoa2:
+32 -> 32
+-64 -> -64
+128 -> 128
+2147483647 -> 2147483647
+-2147483648 -> -2147483648
+```
+
