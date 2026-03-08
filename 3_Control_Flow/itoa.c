@@ -8,7 +8,7 @@ static void itoa2(int n, char s[]);
 static void itob(int n, char s[], int b);
 
 int main(void) {
-  char s[64];
+  char s[64]; /* needs at least 43 for 32-bit binary: "0b " + 32 digits + 7 spaces + '\0' */
   int tests[] = {32, -64, 128, INT_MAX, INT_MIN};
 
   printf("Word size: %d bits\n", (int)sizeof(long) * CHAR_BIT);
@@ -28,9 +28,21 @@ int main(void) {
     printf("%d -> %s\n", tests[i], s);
   }
 
-  printf("\nTesting itoab:\n");
+  printf("\nTo hex:\n");
   for (int i = 0; i < 5; i++) {
     itob(tests[i], s, 16);
+    printf("%d -> %s\n", tests[i], s);
+  }
+
+  printf("\nTo oct:\n");
+  for (int i = 0; i < 5; i++) {
+    itob(tests[i], s, 8);
+    printf("%d -> %s\n", tests[i], s);
+  }
+
+  printf("\nTo bin:\n");
+  for (int i = 0; i < 5; i++) {
+    itob(tests[i], s, 2);
     printf("%d -> %s\n", tests[i], s);
   }
 
@@ -48,21 +60,7 @@ static void reverse(char s[]) {
   }
 }
 
-char itoh(int n) {
-  if (n < 10)
-    return n + '0';
-  switch (n) {
-  case 10:
-  case 11:
-  case 12:
-  case 13:
-  case 14:
-  case 15:
-    return 'a' + n - 10;
-  default:
-    return '?';
-  }
-}
+
 
 /* convert n to characters in s */
 void itoa(int n, char s[]) {
@@ -100,23 +98,52 @@ void itoa2(int n, char s[]) {
   return reverse(s);
 }
 
+/* itob: convert n to base-b string in s.
+   Treats n as unsigned (raw bit pattern — no sign).
+   Hex: uppercase, zero-padded to 8 digits  e.g. 0xFFFFFFCC
+   Oct: leading zero prefix                 e.g. 037777777700
+   Bin: zero-padded, nibbles separated      e.g. 0b 11111111 ... 11000000 */
 void itob(int n, char s[], int b) {
-  int i, sign, c;
+  unsigned int u = (unsigned int)n;
+  char digits[32]; /* raw digits, least significant first */
+  int nd = 0;      /* digit count */
+  int width;       /* zero-pad target width */
+  int i, j;
 
-  sign = n;
+  /* natural widths for zero-padding */
+  if (b == 16)
+    width = sizeof(int) * 2;         /* 8 hex digits for 32-bit int */
+  else if (b == 2)
+    width = sizeof(int) * CHAR_BIT;  /* 32 binary digits for 32-bit int */
+  else
+    width = 0;                       /* no padding for octal or other bases */
 
-  i = 0;
+  /* collect digits least significant first */
   do {
-    if (b == 16)
-      c = itoh(abs(n % 16));
-    else
-      c = abs(n % b) + '0';
-    s[i++] = c;
-  } while ((n /= b) != 0);
+    int d = u % b;
+    digits[nd++] = (b == 16 && d >= 10) ? 'A' + d - 10 : '0' + d;
+  } while ((u /= b) != 0);
 
-  if (sign < 0)
-    s[i++] = '-';
+  /* zero-pad up to target width */
+  while (nd < width)
+    digits[nd++] = '0';
+
+  /* write prefix */
+  i = 0;
+  if (b == 16) {
+    s[i++] = '0'; s[i++] = 'x';
+  } else if (b == 8) {
+    s[i++] = '0';
+  } else if (b == 2) {
+    s[i++] = '0'; s[i++] = 'b'; s[i++] = ' ';
+  }
+
+  /* write digits most significant first;
+     for binary insert a space before each byte boundary */
+  for (j = nd - 1; j >= 0; j--) {
+    if (b == 2 && j < nd - 1 && (nd - 1 - j) % 8 == 0)
+      s[i++] = ' ';
+    s[i++] = digits[j];
+  }
   s[i] = '\0';
-
-  return reverse(s);
 }

@@ -151,11 +151,71 @@ Testing itoa2:
 -2147483648 -> -2147483648
 ```
 
-#### Exercise 3-3
+#### Exercise 3-5
 
 Write the function `itob(n,s,b)` that converts the integer n into a base b
 character representation in the string s. In particular, `itob(n,s,16)`
 formats n as a hexadecimal digit in s.
+
+`itob` casts `n` to `unsigned int` before extracting digits, so negative values
+are shown as their two's complement bit pattern — no sign character, matching the
+convention of `printf("%x")` / `printf("%o")`. Prefixes follow language norms:
+`0x` for hex, `0` for octal, `0b` for binary. Hex is zero-padded to 8 digits;
+binary is zero-padded to 32 bits and grouped into bytes for readability.
+
+To read the sign without a `-` symbol, inspect the most significant bit: if it
+is `1` the value is negative. In hex a leading digit ≥ `8` means MSB is set
+(e.g. `0xFFFFFFC0`). In binary the first bit after `0b` tells you directly
+(e.g. `0b 1111...` → negative). In octal a leading digit ≥ `2` sets bit 31
+(e.g. `037777777700`).
+
+The all-ones pattern of `-64` (`0b 11111111 11111111 11111111 11000000`) is
+characteristic of two's complement: negate by flipping all bits and adding 1,
+so small negative numbers have almost all bits set. This is unintuitive at first
+but is exactly why these representations are used — to expose the raw bit pattern
+rather than hide it behind a sign.
+
+```bash
+Word size: 64 bits
+int size: 32 bits
+INT_MAX: 2147483647
+INT_MIN: -2147483648
+
+Testing itoa:
+32 -> 32
+-64 -> -64
+128 -> 128
+2147483647 -> 2147483647
+-2147483648 -> -(
+
+Testing itoa2:
+32 -> 32
+-64 -> -64
+128 -> 128
+2147483647 -> 2147483647
+-2147483648 -> -2147483648
+
+To hex:
+32 -> 0x00000020
+-64 -> 0xFFFFFFC0
+128 -> 0x00000080
+2147483647 -> 0x7FFFFFFF
+-2147483648 -> 0x80000000
+
+To oct:
+32 -> 040
+-64 -> 037777777700
+128 -> 0200
+2147483647 -> 017777777777
+-2147483648 -> 020000000000
+
+To bin:
+32 -> 0b 00000000 00000000 00000000 00100000
+-64 -> 0b 11111111 11111111 11111111 11000000
+128 -> 0b 00000000 00000000 00000000 10000000
+2147483647 -> 0b 01111111 11111111 11111111 11111111
+-2147483648 -> 0b 10000000 00000000 00000000 00000000
+```
 
 
 
