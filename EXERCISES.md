@@ -217,5 +217,35 @@ To bin:
 -2147483648 -> 0b 10000000 00000000 00000000 00000000
 ```
 
+## Functions and Program Structure
+
+### 4.3 External Variables (Calculator example)
+
+#### Test
+```bash
+$ make test
+gcc -std=c90 -Wall -c test_calculator.c -o test_calculator.o
+gcc -std=c90 -Wall -o test_calculator test_calculator.o getop.o getch.o stack.o -lm
+./test_calculator
+test_push_pop passed
+top of stack: 4
+test_peek passed
+stack underlow
+test_peek underflow passed
+test_swap passed
+error: not enough elements to swap
+test_swap insufficient elements passed
+error: stack empty
+test_clear passed
+test_operations passed
+test_division_by_zero passed
+test_getch_ungetch single character passed
+ungetch: too many characters
+test_getch_ungetch buffer overflow passed
+
+test_getch_ungetch EOF handling passed
+All tests passed
+```
+
 
 
