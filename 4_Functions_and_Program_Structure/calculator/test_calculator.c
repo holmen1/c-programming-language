@@ -1,109 +1,88 @@
-#include <assert.h>
-#include <stdio.h>
 #include "calc.h"
+#include <stdio.h>
+#include <string.h>
 
-void test_push_pop() {
-    push(1.0);
-    push(2.0);
-    assert(pop() == 2.0);
-    assert(pop() == 1.0);
-    printf("test_push_pop passed\n");
+#define CHECK(expr)                                                            \
+  do {                                                                         \
+    if (!(expr)) {                                                             \
+      printf("FAIL %s:%d: %s\n", __FILE__, __LINE__, #expr);                   \
+      fails++;                                                                 \
+    }                                                                          \
+  } while (0)
+
+static int fails = 0;
+
+/* --- unit: stack --- */
+static void test_stack(void) {
+  push(1.0);
+  push(2.0);
+  CHECK(pop() == 2.0);
+  CHECK(pop() == 1.0);
+  CHECK(pop() == 0.0); /* underflow returns 0 */
+
+  push(5.0);
+  push(3.0);
+  swap();
+  CHECK(pop() == 5.0);
+  CHECK(pop() == 3.0);
+
+  push(9.0);
+  swap();              /* only one element: diagnostic printed */
+  CHECK(pop() == 9.0); /* element untouched */
+
+  push(7.0);
+  push(8.0);
+  clear();
+  CHECK(pop() == 0.0); /* empty after clear */
 }
 
-void test_peek() {
-    push(3.0);
-    push(4.0);
-    peek(); /* Should print "Top of stack: 4" */
-    assert(pop() == 4.0);
-    assert(pop() == 3.0);
-    printf("test_peek passed\n");
+/* --- unit: getch/ungetch --- */
+static void test_getch(void) {
+  ungetch('x');
+  CHECK(getch() == 'x');
 
-    /* Test peek underflow */
-    peek(); /* Should print "stack underflow" */
-    printf("test_peek underflow passed\n");
+  ungetch('a');
+  ungetch('b'); /* buffer full: diagnostic printed, 'a' stays */
+  CHECK(getch() == 'a');
 }
 
-void test_swap() {
-    push(1.0);
-    push(2.0);
-    swap(); /* Should swap the top two elements */
-    assert(pop() == 1.0);
-    assert(pop() == 2.0);
-    printf("test_swap passed\n");
+/* --- integration: pipe expression into calculator, check first output line ---
+ */
+static void integration(const char *expr, const char *want) {
+  char cmd[128], got[64];
+  FILE *fp;
 
-    /* Test swap with insufficient elements */
-    push(3.0);
-    swap(); /* Should print "error: not enough elements to swap" */
-    assert(pop() == 3.0);
-    printf("test_swap insufficient elements passed\n");
+  sprintf(cmd, "echo '%s' | ./calculator 2>/dev/null", expr);
+  fp = popen(cmd, "r");
+  if (!fp) {
+    printf("FAIL popen\n");
+    fails++;
+    return;
+  }
+  got[0] = '\0';
+  fgets(got, sizeof(got), fp);
+  pclose(fp);
+  got[strcspn(got, "\n")] = '\0';
+  if (strcmp(got, want) != 0) {
+    printf("FAIL '%s': got='%s' want='%s'\n", expr, got, want);
+    fails++;
+  }
 }
-
-void test_clear() {
-    push(1.0);
-    push(2.0);
-    clear(); /* Should clear the stack */
-    assert(pop() == 0.0); /* Stack should be empty */
-    printf("test_clear passed\n");
-}
-
-void test_operations() {
-    double op2;
-
-    push(5.0);
-    push(3.0);
-    push(pop() + pop()); /* 5 + 3 */
-    assert(pop() == 8.0);
-
-    push(10.0);
-    push(2.0);
-    push(pop() * pop()); /* 10 * 2 */
-    assert(pop() == 20.0);
-
-    push(9.0);
-    push(3.0);
-    op2 = pop();
-    push(pop() - op2); /* 9 - 3 */
-    assert(pop() == 6.0);
-
-    push(8.0);
-    push(2.0);
-    op2 = pop();
-    push(pop() / op2); /* 8 / 2 */
-    assert(pop() == 4.0);
-
-    printf("test_operations passed\n");
-}
-
-void test_division_by_zero() {
-    push(1.0);
-    push(0.0);
-    double result = pop() / pop(); /* 1 / 0 */
-    assert(result == 0.0); /* Should handle division by zero */
-    printf("test_division_by_zero passed\n");
-}
-
-void test_getch_ungetch() {
-    /* Test getch and ungetch with 1-size buffer */
-    ungetch('a');
-    assert(getch() == 'a');
-    printf("test_getch_ungetch single character passed\n");
-
-    /* Test buffer overflow */
-    ungetch('b');
-    ungetch('c'); /* Should print "ungetch: too many characters" */
-    assert(getch() == 'b');
-    printf("test_getch_ungetch buffer overflow passed\n");
-}
-
 
 int main(void) {
-    test_push_pop();
-    test_peek();
-    test_swap();
-    test_clear();
-    test_operations();
-    test_division_by_zero();
-    test_getch_ungetch();
-    printf("All tests passed\n");
-    return 0;
+  test_stack();
+  test_getch();
+
+  integration("2 3 +", "\t5");
+  integration("10 4 -", "\t6");
+  integration("3 4 *", "\t12");
+  integration("8 2 /", "\t4");
+  integration("7 3 %", "\t1");
+  integration("1 0 /", "error: zero divisor");
+
+  if (fails == 0)
+    puts("All tests passed.");
+  else
+    printf("%d test(s) FAILED.\n", fails);
+  return fails ? 1 : 0;
 }
