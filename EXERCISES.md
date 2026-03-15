@@ -224,27 +224,27 @@ To bin:
 #### Test
 ```bash
 $ make test
-gcc -std=c90 -Wall -c test_calculator.c -o test_calculator.o
-gcc -std=c90 -Wall -o test_calculator test_calculator.o getop.o getch.o stack.o -lm
-./test_calculator
-test_push_pop passed
-top of stack: 4
-test_peek passed
-stack underlow
-test_peek underflow passed
-test_swap passed
-error: not enough elements to swap
-test_swap insufficient elements passed
-error: stack empty
-test_clear passed
-test_operations passed
-test_division_by_zero passed
-test_getch_ungetch single character passed
-ungetch: too many characters
-test_getch_ungetch buffer overflow passed
-
-test_getch_ungetch EOF handling passed
-All tests passed
+gcc -std=c90 -Wall -c stack.c -o stack.o
+gcc -std=c90 -Wall -c getch.c -o getch.o
+gcc -std=c90 -Wall -c getop.c -o getop.o
+gcc -std=c90 -Wall -c main.c -o main.o
+gcc -std=c90 -Wall -o calculator stack.o getch.o getop.o main.o -lm
+gcc -std=gnu11 -Wall -o test_calculator stack.c getch.c getop.c test_calculator.c -lm
+./test_calculator 2>/dev/null
+stack: push/pop
+stack: swap
+stack: swap with one element
+stack: clear
+getch: round-trip
+getch: buffer overflow
+integration: 2 3 +
+integration: 10 4 -
+integration: 3 4 *
+integration: 8 2 /
+integration: 7 3 %
+integration: -7 3 %
+integration: 1 0 /
+All tests passed.
 ```
 
 

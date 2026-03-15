@@ -3,7 +3,7 @@ CC = gcc
 
 # Compiler flags
 CFLAGS      = -std=c90 -Wall
-TEST_CFLAGS = -std=gnu11 -Wall
+TEST_CFLAGS = -std=c90 -Wall
 
 # Linker flags
 LDFLAGS = -lm
