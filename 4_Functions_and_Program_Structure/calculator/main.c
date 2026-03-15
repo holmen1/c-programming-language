@@ -31,7 +31,7 @@ int main() {
             if (op2 != 0.0)
                 push(pop() / op2);
             else
-                printf("error: zero divisor\n");
+                fprintf(stderr, "error: zero divisor\n");
             break;
             case '%':
                 op2 = pop();
@@ -39,7 +39,7 @@ int main() {
             if (op2 != 0.0)
                 push(op1 - op2 * (int)(op1 / op2));
             else
-                printf("error: zero divisor\n");
+                fprintf(stderr, "error: zero divisor\n");
             break;
             case 's':
                 push(sin(pop()));
@@ -51,7 +51,7 @@ int main() {
                 printf("\t%.8g\n", pop());
             break;
             default:
-                printf("error: unknown command %s\n", s);
+                fprintf(stderr, "error: unknown command %s\n", s);
             break;
         }
     }

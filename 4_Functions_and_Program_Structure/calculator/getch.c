@@ -16,7 +16,7 @@ void ungetch(int c) /* push character back to input */
         return; /* Do not push back EOF */
     }
     if (bufp >= BUFSIZE)
-        printf("ungetch: too many characters\n");
+        fprintf(stderr, "ungetch: too many characters\n");
     else
         buf[bufp++] = c;
 }

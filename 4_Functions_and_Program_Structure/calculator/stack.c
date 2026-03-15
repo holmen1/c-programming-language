@@ -9,23 +9,23 @@ void push(double f) {
     if (sp < MAXVAL)
         val[sp++] = f;
     else
-        printf("error: stack full, can't push %g\n", f);
+        fprintf(stderr, "error: stack full, can't push %g\n", f);
 }
 
 double pop(void) {
     if (sp > 0)
         return val[--sp];
-    printf("error: stack empty\n");
+    fprintf(stderr, "error: stack empty\n");
     return 0.0;
 }
 
 void peek(void) {
     if (sp > MAXVAL)
-        printf("error: stack overflow\n");
+        fprintf(stderr, "error: stack overflow\n");
     else if (sp > 0)
         printf("top of stack: %.8g\n", val[sp - 1]);
     else
-        printf("stack underlow\n");
+        fprintf(stderr, "stack underflow\n");
 }
 
 void swap(void) {
@@ -34,7 +34,7 @@ void swap(void) {
         val[sp - 1] = val[sp - 2];
         val[sp - 2] = temp;
     } else {
-        printf("error: not enough elements to swap\n");
+        fprintf(stderr, "error: not enough elements to swap\n");
     }
 }
 

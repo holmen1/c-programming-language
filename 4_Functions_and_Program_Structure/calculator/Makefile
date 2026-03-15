@@ -40,7 +40,7 @@ $(TEST_TARGET): $(TARGET) $(TEST_SRCS)
 
 # Phony target to run tests (builds and executes)
 test: $(TEST_TARGET)
-	./$(TEST_TARGET)
+	./$(TEST_TARGET) 2>/dev/null
 
 # Rule to clean up build files (includes test files)
 clean:

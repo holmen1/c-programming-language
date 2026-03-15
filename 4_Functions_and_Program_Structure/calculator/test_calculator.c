@@ -48,11 +48,14 @@ static void test_getch(void) {
 
 /* --- integration: pipe expression into calculator, check first output line ---
  */
-static void integration(const char *expr, const char *want) {
+static void integration(const char *expr, const char *want, int from_stderr) {
   char cmd[128], got[64];
   FILE *fp;
 
-  sprintf(cmd, "echo '%s' | ./calculator 2>/dev/null", expr);
+  sprintf(cmd,
+          from_stderr ? "echo '%s' | ./calculator 2>&1 1>/dev/null"
+                      : "echo '%s' | ./calculator 2>/dev/null",
+          expr);
   fp = popen(cmd, "r");
   if (!fp) {
     printf("FAIL popen\n");
@@ -73,12 +76,12 @@ int main(void) {
   test_stack();
   test_getch();
 
-  integration("2 3 +", "\t5");
-  integration("10 4 -", "\t6");
-  integration("3 4 *", "\t12");
-  integration("8 2 /", "\t4");
-  integration("7 3 %", "\t1");
-  integration("1 0 /", "error: zero divisor");
+  integration("2 3 +", "\t5", 0);
+  integration("10 4 -", "\t6", 0);
+  integration("3 4 *", "\t12", 0);
+  integration("8 2 /", "\t4", 0);
+  integration("7 3 %", "\t1", 0);
+  integration("1 0 /", "error: zero divisor", 1);
 
   if (fails == 0)
     puts("All tests passed.");
