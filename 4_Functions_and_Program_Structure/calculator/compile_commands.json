@@ -1,0 +1,110 @@
+[
+  {
+    "file": "stack.c",
+    "arguments": [
+      "gcc",
+      "-std=c90",
+      "-Wall",
+      "-c",
+      "stack.c",
+      "-o",
+      "stack.o"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "stack.o"
+  },
+  {
+    "file": "getch.c",
+    "arguments": [
+      "gcc",
+      "-std=c90",
+      "-Wall",
+      "-c",
+      "getch.c",
+      "-o",
+      "getch.o"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "getch.o"
+  },
+  {
+    "file": "getop.c",
+    "arguments": [
+      "gcc",
+      "-std=c90",
+      "-Wall",
+      "-c",
+      "getop.c",
+      "-o",
+      "getop.o"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "getop.o"
+  },
+  {
+    "file": "main.c",
+    "arguments": [
+      "gcc",
+      "-std=c90",
+      "-Wall",
+      "-c",
+      "main.c",
+      "-o",
+      "main.o"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "main.o"
+  },
+  {
+    "file": "stack.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu11",
+      "-Wall",
+      "-o",
+      "test_calculator",
+      "stack.c"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "test_calculator"
+  },
+  {
+    "file": "getch.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu11",
+      "-Wall",
+      "-o",
+      "test_calculator",
+      "getch.c"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "test_calculator"
+  },
+  {
+    "file": "getop.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu11",
+      "-Wall",
+      "-o",
+      "test_calculator",
+      "getop.c"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "test_calculator"
+  },
+  {
+    "file": "test_calculator.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu11",
+      "-Wall",
+      "-o",
+      "test_calculator",
+      "test_calculator.c"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/4_Functions_and_Program_Structure/calculator",
+    "output": "test_calculator"
+  }
+]
