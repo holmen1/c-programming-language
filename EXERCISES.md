@@ -221,6 +221,11 @@ To bin:
 
 ### 4.3 External Variables (Calculator example)
 
+**Terminal note:** input is line-buffered by the tty (canonical mode) — keystrokes
+are held until Enter, so `2 P` sends `2`, `P`, `\n` to the process only after Enter.
+`P` mid-expression peeks the current top; `\n` then pops and prints same value.
+Raw mode (`tcsetattr`) would allow keystroke-by-keystroke input but is beyond K&R scope.
+
 #### Exercise 4-3
 Given the framework, it's straightforward to extend the calculator. Add the modulus (%) operator
 and provisions for negative numbers.
@@ -259,12 +264,14 @@ gcc -std=c90 -Wall -c getch.c -o getch.o
 gcc -std=c90 -Wall -c getop.c -o getop.o
 gcc -std=c90 -Wall -c main.c -o main.o
 gcc -std=c90 -Wall -o calculator stack.o getch.o getop.o main.o -lm
-gcc -std=gnu11 -Wall -o test_calculator stack.c getch.c getop.c test_calculator.c -lm
+gcc -std=c90 -Wall -o test_calculator stack.c getch.c getop.c test_calculator.c -lm
 ./test_calculator 2>/dev/null
 stack: push/pop
 stack: swap
 stack: swap with one element
 stack: clear
+stack: peek
+stack: peek empty
 getch: round-trip
 getch: buffer overflow
 integration: 2 3 +
@@ -274,6 +281,10 @@ integration: 8 2 /
 integration: 7 3 %
 integration: -7 3 %
 integration: 1 0 /
+integration: 2 3 + P
+integration: 3 D +
+integration: 5 3 S
+integration: 3 4 C
 All tests passed.
 ```
 

@@ -40,6 +40,14 @@ static void test_stack(void) {
   push(8.0);
   clear();
   CHECK(pop() == 0.0); /* empty after clear */
+
+  puts("stack: peek");
+  push(42.0);
+  CHECK(peek() == 42.0); /* peek returns top */
+  CHECK(pop() == 42.0);  /* value still on stack after peek */
+
+  puts("stack: peek empty");
+  CHECK(peek() == 0.0);  /* underflow returns 0 */
 }
 
 /* --- unit: getch/ungetch --- */
@@ -92,6 +100,10 @@ int main(void) {
   integration("7 3 %", "\t1", 0);
   integration("-7 3 %", "\t-1", 0);
   integration("1 0 /", "error: zero divisor", 1);
+  integration("2 3 + P", "\t5", 0); /* peek: prints top, value remains */
+  integration("3 D +",   "\t6", 0); /* dup: 3 duplicated then added */
+  integration("5 3 S",   "\t5", 0); /* swap: top becomes 5 after swap */
+  integration("3 4 C",   "\t0", 0); /* clear: stack empty, pop returns 0 */
 
   if (fails == 0)
     puts("All tests passed.");

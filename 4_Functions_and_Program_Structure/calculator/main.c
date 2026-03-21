@@ -44,6 +44,18 @@ int main() {
             case 's':
                 push(sin(pop()));
             break;
+            case 'P':
+                printf("\t%.8g\n", peek());
+            break;
+            case 'D':
+                push(peek());
+            break;
+            case 'S':
+                swap();
+            break;
+            case 'C':
+                clear();
+            break;
             case 'e':
                 push(exp(pop()));
             break;

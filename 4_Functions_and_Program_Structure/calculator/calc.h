@@ -2,7 +2,7 @@
 /* stack */
 void push(double);
 double pop(void);
-void peek(void);
+double peek(void);
 void swap(void);
 void clear(void);
 
