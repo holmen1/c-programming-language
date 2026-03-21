@@ -7,6 +7,15 @@ int getop(char s[]) {
   while ((s[0] = c = getch()) == ' ' || c == '\t')
     ;
   s[1] = '\0';
+  if (c == '\n')
+    return c;
+  if (islower(c)) {
+    while (islower(s[++i] = c = getch()))
+      ;
+    ungetch(c);
+    s[i] = '\0';
+    return MATHOP;
+  }
   if (c == '-') {
     int next = getch();
     if (isdigit(next) || next == '.')
