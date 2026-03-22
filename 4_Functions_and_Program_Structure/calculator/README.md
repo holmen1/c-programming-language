@@ -8,22 +8,30 @@ Welcome to the **Ultimate Reverse Polish Notation (RPN) Calculator**! This light
 * **Variable Storage:** Use lowercase letters to store and recall your calculations on the fly.
 * **Streamlined Engine:** Powered by a highly optimized, self-contained lexical analyzer using a one-character memory state (zero external buffering required!).
 
+## Building the Project
+Simply run `make` in this directory to compile the source code and generate the executable.
+
+```bash
+make
+./calculator
+```
+
 ## How to Use
-Launch the executable and type your expressions in RPN format, separating numbers and operators with spaces. Press `Enter` to evaluate and print the result.
+Launch the executable and type your expressions in RPN format, separating numbers and operators with spaces. Press `Enter` to evaluate. (Note: Output is prefixed with a tab character to distinguish it from your input).
 
 ### Examples
 ```text
-> 4 5 +
-9
+4 5 +
+	9
 
-> 10 2 /
-5
+10 2 /
+	5
 
-> -5 2.5 *
--12.5
+-5 2.5 *
+	-12.5
 
-> 5 1 2 + 4 * + 3 -
-14
+5 1 2 + 4 * + 3 -
+	14
 ```
 
 ### Supported Operations
@@ -31,6 +39,7 @@ Launch the executable and type your expressions in RPN format, separating number
 * `-` : Subtraction
 * `*` : Multiplication
 * `/` : Division
+* `%` : Modulo (Note: Built using floating-point remainder which may behave slightly differently than standard integer modulo `c % d` for negative numbers).
 * Math operators and variables functionality built in! 
 
 ---
