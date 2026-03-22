@@ -34,5 +34,6 @@ int getop(char s[]) {
     while (isdigit(s[++i] = c = getch()))
       ;
   s[i] = '\0';
+  ungetch(c);
   return NUMBER;
 }

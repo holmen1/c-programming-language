@@ -240,10 +240,6 @@ Add access to library functions like `sin`, `exp` and `pow`.
 #### Exercise 4-6
 Add commands for handling variables. Add a variable for the for the most recently printed value.
 
-#### Exercise 4-7
-Write a routine for `ungets(s)` that will push back an entire string onto the input.
-Should ungets know about `buf` and `bufp`, or should it just use `ungetch`?
-
 #### Exercise 4-8
 Suppose there will never be more than one character of pushback. Modify `getch`
 and `ungetch` accordingly.
@@ -252,9 +248,8 @@ and `ungetch` accordingly.
 Our `getch` and `ungetch` do not handle a pushed-back EOF correctly. Decide what their properties
 ought to be if an EOF is pushed back, then implement your design.
 
-#### Exercise 4-10
-An alternate organisation uses `getline` to read an entire input line;
-this makes `getch` and `ungetch` unnecessary. Revise the calculator to use this approach. 
+#### Exercise 4-11
+Modify `getop` so that it doesn't need to use `ungetch` unnecessary.
 
 #### Test
 ```bash

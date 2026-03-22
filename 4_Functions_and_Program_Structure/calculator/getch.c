@@ -2,7 +2,7 @@
 
 #define BUFSIZE 1 /* maximum buffer size */
 
-char buf[BUFSIZE]; /* buffer for ungetch */
+int buf[BUFSIZE]; /* buffer for ungetch */
 int bufp = 0;
 
 int getch(void) /* get a (possibly pushed back) character */
@@ -12,9 +12,6 @@ int getch(void) /* get a (possibly pushed back) character */
 
 void ungetch(int c) /* push character back to input */
 {
-    if (c == EOF) {
-        return; /* Do not push back EOF */
-    }
     if (bufp >= BUFSIZE)
         fprintf(stderr, "ungetch: too many characters\n");
     else
