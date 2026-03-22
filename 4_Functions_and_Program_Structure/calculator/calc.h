@@ -9,5 +9,6 @@ void swap(void);
 void clear(void);
 
 int getop(char[]);
+/* Not needed, Exercise 4-11, used in test */
 int getch(void);
 void ungetch(int);

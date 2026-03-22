@@ -3,37 +3,43 @@
 
 int getop(char s[]) {
   int i = 0;
-  static int c;
-  while ((s[0] = c = getch()) == ' ' || c == '\t')
-    ;
+  int c;
+  static int lastc = 0;
+
+  c = (lastc == 0) ? getchar() : lastc;
+  lastc = 0;
+
+  while ((s[0] = c) == ' ' || c == '\t')
+    c = getchar();
+
   s[1] = '\0';
   if (c == '\n')
     return c;
   if (islower(c)) {
-    while (islower(s[++i] = c = getch()))
+    while (islower(s[++i] = c = getchar()))
       ;
-    ungetch(c);
+    lastc = c;
     s[i] = '\0';
     return (i == 1) ? VARIABLE : MATHOP;
   }
   if (c == '-') {
-    int next = getch();
+    int next = getchar();
     if (isdigit(next) || next == '.')
       s[++i] = c = next;
     else {
-      ungetch(next);
+      lastc = next;
       return '-';
     }
   }
   if (!isdigit(c) && c != '.')
     return c;
   if (isdigit(c))
-    while (isdigit(s[++i] = c = getch()))
+    while (isdigit(s[++i] = c = getchar()))
       ;
   if (c == '.')
-    while (isdigit(s[++i] = c = getch()))
+    while (isdigit(s[++i] = c = getchar()))
       ;
   s[i] = '\0';
-  ungetch(c);
+  lastc = c;
   return NUMBER;
 }
