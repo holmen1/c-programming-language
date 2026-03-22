@@ -11,11 +11,23 @@ int main() {
   int type;
   double op1, op2;
   char s[MAXOP];
+  double var[26] = {0.0};
+  int vindex = -1;
 
   while ((type = getop(s)) != EOF) {
     switch (type) {
     case NUMBER:
       push(atof(s));
+      break;
+    case VARIABLE:
+      vindex = s[0] - 'a';
+      push(var[vindex]);
+      break;
+    case '=':
+      if (vindex >= 0) {
+        pop(); /* discard placeholder pushed by VARIABLE */
+        var[vindex] = pop();
+      }
       break;
     case MATHOP:
       if (strcmp(s, "exp") == 0)
@@ -54,7 +66,8 @@ int main() {
         fprintf(stderr, "error: zero divisor\n");
       break;
     case 'P':
-      printf("\t%.8g\n", peek());
+      var['z' - 'a'] = peek();
+      printf("\t%.8g\n", var['z' - 'a']);
       break;
     case 'D':
       push(peek());
@@ -66,7 +79,8 @@ int main() {
       clear();
       break;
     case '\n':
-      printf("\t%.8g\n", pop());
+      var['z' - 'a'] = pop();
+      printf("\t%.8g\n", var['z' - 'a']);
       break;
     default:
       fprintf(stderr, "error: unknown command %s\n", s);
@@ -77,5 +91,5 @@ int main() {
 }
 
 /*
-$ gcc -std=c90 -Wall -o calculator getch.c getop.c stack.c main.c -lm
+$ gcc -std=c90 -Wall -g -o calculator stack.c getch.c getop.c main.c -lm
 */

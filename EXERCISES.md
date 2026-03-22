@@ -285,6 +285,11 @@ integration: 2 3 + P
 integration: 3 D +
 integration: 5 3 S
 integration: 3 4 C
+integration: 0.3 cos 2 pow 0.3 sin 2 pow +
+integration: 1 exp
+integration: 7 a = 3 a -
+integration: 5 a = a a *
+integration_last: '5 a = a a *' 'z 1 +'
 All tests passed.
 ```
 

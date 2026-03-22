@@ -1,4 +1,5 @@
 #define NUMBER '0'
+#define VARIABLE '1'
 #define MATHOP '2'
 /* stack */
 void push(double);

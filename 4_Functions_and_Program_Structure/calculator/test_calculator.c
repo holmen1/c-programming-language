@@ -90,6 +90,26 @@ static void integration(const char *expr, const char *want, int from_stderr) {
   }
 }
 
+/* pipe two newline-separated expressions; check the last output line */
+static void integration_last(const char *expr, const char *want) {
+  char cmd[256], got[64], line[64];
+  FILE *fp;
+
+  sprintf(cmd, "printf '%%s\\n' %s | ./calculator 2>/dev/null", expr);
+  printf("integration_last: %s\n", expr);
+  fp = popen(cmd, "r");
+  if (!fp) { printf("FAIL popen\n"); fails++; return; }
+  got[0] = '\0';
+  while (fgets(line, sizeof(line), fp))
+    strcpy(got, line);
+  pclose(fp);
+  got[strcspn(got, "\n")] = '\0';
+  if (strcmp(got, want) != 0) {
+    printf("FAIL '%s': got='%s' want='%s'\n", expr, got, want);
+    fails++;
+  }
+}
+
 int main(void) {
   test_stack();
   test_getch();
@@ -107,6 +127,11 @@ int main(void) {
   integration("3 4 C", "\t0", 0);   /* clear: stack empty, pop returns 0 */
   integration("0.3 cos 2 pow 0.3 sin 2 pow +", "\t1", 0);
   integration("1 exp", "\t2.7182818", 0); /* e^1 */
+
+  /* 4-6: variables */
+  integration("7 a = 3 a -", "\t-4", 0);           /* 3 - 7 = -4, without vars: 7-3=4 */
+  integration("5 a = a a *", "\t25", 0);            /* store 5, retrieve twice: 5*5=25 */
+  integration_last("'5 a = a a *' 'z 1 +'", "\t26"); /* z=25 from prev line, z+1=26 */
 
   if (fails == 0)
     puts("All tests passed.");

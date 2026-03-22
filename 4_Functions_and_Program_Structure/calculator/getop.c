@@ -14,7 +14,7 @@ int getop(char s[]) {
       ;
     ungetch(c);
     s[i] = '\0';
-    return MATHOP;
+    return (i == 1) ? VARIABLE : MATHOP;
   }
   if (c == '-') {
     int next = getch();
