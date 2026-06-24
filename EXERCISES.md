@@ -248,9 +248,6 @@ and `ungetch` accordingly.
 Our `getch` and `ungetch` do not handle a pushed-back EOF correctly. Decide what their properties
 ought to be if an EOF is pushed back, then implement your design.
 
-#### Exercise 4-11
-Modify `getop` so that it doesn't need to use `ungetch` unnecessary.
-
 #### Test
 ```bash
 $ make test
@@ -288,5 +285,14 @@ integration_last: '5 a = a a *' 'z 1 +'
 All tests passed.
 ```
 
+### 4.6 Static Variables
 
+The `static` declaration can also be applied to internal variables. Internal `static`
+variables are local to a paraticular function just as automatic variables are, but
+unlike automatics, they remain in existence rather than coming and going each time
+the function is activated. This means that internal `static` variables provide private,
+permanent storage within a single function.
+
+#### Exercise 4-11
+Modify `getop` so that it doesn't need to use `ungetch` unnecessary.
 
