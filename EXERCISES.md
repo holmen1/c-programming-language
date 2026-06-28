@@ -320,3 +320,35 @@ $ ./a.out
 reverse(hello mats) = stam olleh
 ```
 
+### 4.11 The C Preprocessor
+
+#### Exercise 4-14
+Define a macro
+[swap(t,x,y)](4_Functions_and_Program_Structure/macro.c)
+that interchanges two arguments of type t.
+```bash
+$ gcc -std=c90 -Wall macro.c
+$ ./a.out
+s=hello t=world
+swap(char*, s, t)
+s=world t=hello
+```
+
+Option `-E` Preprocess only; do not compile, assemble or link.
+```bash
+$ gcc -std=c90 -Wall -E macro.c
+[...]
+
+# 5 "macro.c"
+int main(void) {
+  char *s = "hello";
+  char *t = "world";
+  printf("s=%s\tt=%s\n", s, t);
+  printf("swap(char*, s, t)\n");
+  { char* temp; temp = s; s = t; t = temp; };
+  printf("s=%s\tt=%s\n", s, t);
+
+  return 0;
+}
+```
+
