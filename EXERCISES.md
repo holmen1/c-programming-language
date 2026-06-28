@@ -300,7 +300,7 @@ so that it doesn't need to use `ungetch` unnecessary.
 ### 4.10 Recursion
 
 #### Exercise 4-12
-Adapt the ideas of `printd` to write a recursive version of [ìtoa]
-(4_Functions_and_Program_Structure/itoa.c);
+Adapt the ideas of `printd` to write a recursive version of
+[ìtoa](4_Functions_and_Program_Structure/itoa.c);
 that is, convert an integer into a string by calling a recursive routine.
 
