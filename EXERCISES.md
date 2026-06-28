@@ -294,5 +294,13 @@ the function is activated. This means that internal `static` variables provide p
 permanent storage within a single function.
 
 #### Exercise 4-11
-Modify `getop` so that it doesn't need to use `ungetch` unnecessary.
+Modify [getop](https://github.com/holmen1/c-programming-language/commit/056a3bf413bfa039c038855ce2ab0c86b0dc82ba)
+so that it doesn't need to use `ungetch` unnecessary.
+
+### 4.10 Recursion
+
+#### Exercise 4-12
+Adapt the ideas of `printd` to write a recursive version of [ìtoa]
+(4_Functions_and_Program_Structure/itoa.c);
+that is, convert an integer into a string by calling a recursive routine.
 
