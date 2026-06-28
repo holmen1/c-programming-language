@@ -303,4 +303,11 @@ so that it doesn't need to use `ungetch` unnecessary.
 Adapt the ideas of `printd` to write a recursive version of
 [ìtoa](4_Functions_and_Program_Structure/itoa.c);
 that is, convert an integer into a string by calling a recursive routine.
+```bash
+$ gcc -std=c90 -Wall itoa.c
+$ ./a.out
+itoa(123) -> 123
+itoa(-1234) -> -1234
+itoa(0) -> 0
+```
 
