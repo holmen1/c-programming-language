@@ -311,3 +311,12 @@ itoa(-1234) -> -1234
 itoa(0) -> 0
 ```
 
+#### Exercise 4-13
+Write a recursive version of the function [reverse(s)](4_Functions_and_Program_Structure/reverse.c),
+which reverses the string `s` in place.
+```bash
+$ gcc -std=c90 -Wall reverse.c
+$ ./a.out
+reverse(hello mats) = stam olleh
+```
+
