@@ -352,3 +352,12 @@ int main(void) {
 }
 ```
 
+## Pointers and Arrays
+
+### Character Pointers and Funtions
+
+#### Exercise 5-3
+Write a pointer version of the function [strcat(s,t)](5_Pointers_and_Arrays/string/strcat.c)
+that copies the string `t` to the end of `s`.
+
+
