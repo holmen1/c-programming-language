@@ -1,4 +1,3 @@
-#include "alloc.h"
 #include <stdio.h>
 
 #define MAXLEN 1000
@@ -7,18 +6,20 @@ int _getline(char *s, int lim);
 void strcopy(char *to, char *from);
 
 /* readlines: read input lines */
-int readlines(char *lineptr[], int maxlines) {
+int readlines(char *lineptr[], int maxlines, char *linestorage, int maxstorage) {
   int len, nlines;
-  char *p, line[MAXLEN];
+  char line[MAXLEN];
+  char* storage_end = linestorage + maxstorage;
 
   nlines = 0;
   while ((len = _getline(line, MAXLEN)) > 0)
-    if (nlines >= maxlines || (p = alloc(len)) == NULL)
+    if (nlines >= maxlines || linestorage + len > storage_end)
       return -1;
     else {
       line[len - 1] = '\0';
-      strcopy(p, line);
-      lineptr[nlines++] = p;
+      strcopy(linestorage, line);
+      lineptr[nlines++] = linestorage;
+      linestorage += len;
     }
   return nlines;
 }
