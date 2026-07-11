@@ -1,2 +1,0 @@
-
-int strend(char*, char*);

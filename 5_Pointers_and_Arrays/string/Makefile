@@ -8,11 +8,11 @@ CFLAGS = -std=gnu90 -Wall -Wextra
 TARGET = test
 
 # Source files for main
-SRCS = strcat.c test.c
+SRCS = strcat.c strend.c test.c
 
 # Default target to build the executable
 all:
-	$(CC) $(SRCS) -o $(TARGET)
+	$(CC) $(CFLAGS) $(SRCS) -o $(TARGET)
 
 # Rule to clean up build files (includes test files)
 clean:

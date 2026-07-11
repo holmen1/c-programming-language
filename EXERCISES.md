@@ -360,4 +360,7 @@ int main(void) {
 Write a pointer version of the function [strcat(s,t)](5_Pointers_and_Arrays/string/strcat.c)
 that copies the string `t` to the end of `s`.
 
+#### Exercise 5-4
+Write the function [strend(s,t)](5_Pointers_and_Arrays/string/strend.c),
+which returns 1 if the string `t` occurs at the end of the string `s`, and 0 otherwise.
 
