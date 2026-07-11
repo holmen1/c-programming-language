@@ -364,3 +364,10 @@ that copies the string `t` to the end of `s`.
 Write the function [strend(s,t)](5_Pointers_and_Arrays/string/strend.c),
 which returns 1 if the string `t` occurs at the end of the string `s`, and 0 otherwise.
 
+### Pointer Arrays: Pointers to Pointers
+
+#### Exercise 5-7
+Rewrite `readlines` to store lines in an array supplied by `main`,
+rather than calling `alloc` to maintain storage.
+
+
