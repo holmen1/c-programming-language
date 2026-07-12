@@ -1,0 +1,58 @@
+[
+  {
+    "file": "main.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu90",
+      "-Wall",
+      "-Wextra",
+      "main.c",
+      "-o",
+      "mysort"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/5_Pointers_and_Arrays/sort",
+    "output": "mysort"
+  },
+  {
+    "file": "readlines.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu90",
+      "-Wall",
+      "-Wextra",
+      "readlines.c",
+      "-o",
+      "mysort"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/5_Pointers_and_Arrays/sort",
+    "output": "mysort"
+  },
+  {
+    "file": "alloc.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu90",
+      "-Wall",
+      "-Wextra",
+      "alloc.c",
+      "-o",
+      "mysort"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/5_Pointers_and_Arrays/sort",
+    "output": "mysort"
+  },
+  {
+    "file": "qsort.c",
+    "arguments": [
+      "gcc",
+      "-std=gnu90",
+      "-Wall",
+      "-Wextra",
+      "qsort.c",
+      "-o",
+      "mysort"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/5_Pointers_and_Arrays/sort",
+    "output": "mysort"
+  }
+]
