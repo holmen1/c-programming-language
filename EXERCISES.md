@@ -370,4 +370,12 @@ which returns 1 if the string `t` occurs at the end of the string `s`, and 0 oth
 Rewrite `readlines` to store lines in an array supplied by `main`,
 rather than calling `alloc` to maintain storage.
 
+```bash
+ make -f Makefile57
 
+time ./mysort57 < sample.txt 
+
+real    0m0.238s
+user    0m0.027s
+sys     0m0.002s
+```
