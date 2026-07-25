@@ -379,3 +379,15 @@ real    0m0.238s
 user    0m0.027s
 sys     0m0.002s
 ```
+
+### Pointers vs. Multi-dimensional Arrays
+
+#### Exercise 5-9
+Rewrite the routines
+[day_of_year](5_Pointers_and_Arrays/date/main.c) and
+[month_day](5_Pointers_and_Arrays/date/main.c)
+with pointers instead of indexing.
+
+
+
+
