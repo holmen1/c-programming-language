@@ -388,6 +388,13 @@ Rewrite the routines
 [month_day](5_Pointers_and_Arrays/date/main.c)
 with pointers instead of indexing.
 
+### Command-line Arguments
+
+#### Exercise 5-10
+Write the program
+[expr](5_Pointers_and_Arrays/date/main.c),
+which evaluates a reverse Polish expression from the command line,
+where each operator or operand is a separate argument.
 
 
 
