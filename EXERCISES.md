@@ -392,9 +392,13 @@ with pointers instead of indexing.
 
 #### Exercise 5-10
 Write the program
-[expr](5_Pointers_and_Arrays/date/main.c),
+[expr](5_Pointers_and_Arrays/myexpr.c),
 which evaluates a reverse Polish expression from the command line,
 where each operator or operand is a separate argument.
 
-
+```bash
+$ gcc -std=gnu90 -Wall -Wextra myexpr.c
+$ ./a.out 2 3 4 + x 4 -
+10
+```
 
