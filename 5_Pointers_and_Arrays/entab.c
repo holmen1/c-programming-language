@@ -20,21 +20,16 @@ int main(int argc, char *argv[]) {
         spaces = 0;
       }
       continue;
-    } else {
-      if (c == '\n') {
-        print_spaces(spaces);
-        printf("%c", c);
-        spaces = col = 0;
-        continue;
-      } else if (spaces) {
-        print_spaces(spaces);
-        printf("%c", c);
-        spaces = 0;
-        continue;
-      } else
-        printf("%c", c);
     }
+    if (spaces) {
+      print_spaces(spaces);
+      spaces = 0;
+    }
+    printf("%c", c);
+    if (c == '\n')
+      col = 0;
   }
+
   return 0;
 }
 
