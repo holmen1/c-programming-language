@@ -417,3 +417,9 @@ $ diff -s tabbad.txt retabbad.txt
 Files tabbad.txt and retabbad.txt are identical
 ```
 
+#### Exercise BONUS
+
+Simple
+[ls](5_Pointers_and_Arrays/ls.c),
+[tac](5_Pointers_and_Arrays/tac.c) and
+[cat](5_Pointers_and_Arrays/cat.c)
