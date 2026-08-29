@@ -404,8 +404,19 @@ $ ./a.out 2 3 4 + x 4 -
 
 
 #### Exercise 5-11
-Modify the programs `entab` and `detab` to accept a list of tab stops as arguments.
+Modify the programs
+[entab](5_Pointers_and_Arrays/date/args/entab.c) and
+[detab](5_Pointers_and_Arrays/date/args/detab.c)
+to accept a list of tab stops as arguments.
 Use the default tab settings if there are no arguments.
+
+```bash
+$ diff -s <(./detab -t 2 tabbad.txt) <(expand -t 2 tabbad.txt)
+Files /dev/fd/63 and /dev/fd/62 are identical
+$ diff -s <(./detab -t 2 < tabbad.txt) <(expand -t 2 < tabbad.txt)
+Using stdin...
+Files /dev/fd/63 and /dev/fd/62 are identical
+```
 
 ```bash
 $ diff -s <(expand < tabbad.txt) <(./a.out < tabbad.txt)
