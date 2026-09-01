@@ -434,3 +434,9 @@ Simple
 [ls](5_Pointers_and_Arrays/ls.c),
 [tac](5_Pointers_and_Arrays/tac.c) and
 [cat](5_Pointers_and_Arrays/cat.c)
+
+#### Exercise 5-13
+Write the program
+[tail](5_Pointers_and_Arrays/date/args/tail.c), which prints the last `n` lines of its input.
+
+
