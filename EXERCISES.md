@@ -440,3 +440,22 @@ Write the program
 [tail](5_Pointers_and_Arrays/date/args/tail.c), which prints the last `n` lines of its input.
 
 
+## Structures
+
+### Arrays of Structures
+
+#### Exercise 6-1
+Our version of
+[getword](6_Structures/keywords/getword.c) does not properly handle underscores,
+string constants, comments, or preprocessor control lines. Write a better version
+```bash
+$ ./keywords < main.c
+   4 char
+   1 for
+   5 if
+   9 int
+   3 struct
+   1 void
+   2 while
+```
+

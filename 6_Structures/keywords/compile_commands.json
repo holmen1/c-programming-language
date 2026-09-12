@@ -1,0 +1,32 @@
+[
+  {
+    "file": "getword.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c90",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "getword.c",
+      "-o",
+      "getword.o"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/6_Structures/keywords",
+    "output": "getword.o"
+  },
+  {
+    "file": "main.c",
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c90",
+      "-Wall",
+      "-Wextra",
+      "-c",
+      "main.c",
+      "-o",
+      "main.o"
+    ],
+    "directory": "/home/holmen1/repos/c-programming-language/6_Structures/keywords",
+    "output": "main.o"
+  }
+]
