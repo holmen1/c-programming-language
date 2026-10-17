@@ -7,12 +7,12 @@ struct key {
   char *word;
   int count;
 } keytab[] = {{"auto", 0},     {"break", 0},    {"case", 0},    {"char", 0},
-              {"const", 0},    {"continue", 0}, {"default", 0}, {"for", 0},
+              {"const", 0},    {"continue", 0}, {"default", 0}, {"find", 0}, {"for", 0},
 	      {"if", 0},       {"int", 0},      {"struct", 0},  {"unsigned", 0},
 	      {"void", 0},     {"while", 0}};
 
-#define NKEYS (sizeof keytab / sizeof(struct key))
 #define MAXWORD 100
+enum { NKEYS = sizeof keytab / sizeof(struct key) };
 
 int binsearch(char *, struct key *, int);
 
