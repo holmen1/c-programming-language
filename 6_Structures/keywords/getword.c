@@ -25,16 +25,24 @@ int getword(char *word, int lim) {
 
   /* Handle string constants */
   if (c == '"') {
-    for (; --lim > 0; w++) {
-      *w = getch();
-      if (*w == '\\') { /* Handle escaped characters */
-        *++w = getch();
-      } else if (*w == '"' || *w == EOF) {
-        break;
+    char *end = word + lim - 1; /* last slot reserved for '\0' */
+    int ch;
+
+    /* Consume the whole literal; store only what fits in the buffer */
+    while ((ch = getch()) != EOF && ch != '"') {
+      if (w < end)
+        *w++ = ch;
+      if (ch == '\\') { /* Handle escaped characters */
+        if ((ch = getch()) == EOF)
+          break;
+        if (w < end)
+          *w++ = ch;
       }
     }
+    if (w > end)
+      w = end;
     *w = '\0';
-    return word[0];
+    return c;
   }
 
   /* Handle multi-line comments */
