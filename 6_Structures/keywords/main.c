@@ -1,4 +1,3 @@
-#include "getword.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -14,6 +13,7 @@ struct key {
 #define MAXWORD 100
 enum { NKEYS = sizeof keytab / sizeof(struct key) };
 
+int getword(char *, int);
 int binsearch(char *, struct key *, int);
 
 /* count C keywords */
