@@ -459,3 +459,39 @@ $ ./keywords < main.c
    2 while
 ```
 
+### Pointers to Structures
+
+Same `keywords` using pointers instead of array indices.
+By modifying
+[main](6_Structures/keywords/main2.c) and `binsearch`.
+
+### Self-referential Structures
+
+Count occurance of all words using a `binary tree`, see
+[wordcount](6_Structures/wordcount)
+
+```bash
+gcc -std=c90 -Wall -Wextra -c tree.c
+gcc -std=c90 -Wall -Wextra -c main.c
+gcc -std=c90 -Wall -Wextra -o wordcount ../keywords/getword.o tree.o main.o
+./wordcount < ../keywords/main.c
+   1 EOF
+   2 MAXWORD
+   3 NKEYS
+   3 binsearch
+   5 char
+   [...]
+   3 return
+   2 sizeof
+   1 strcmp
+   4 struct
+   2 tab
+   1 void
+   2 while
+   9 word
+```
+reusing `getword` from prvious exercise.
+
+
+
+

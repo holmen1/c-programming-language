@@ -1,9 +1,9 @@
-#include "getword.h"
 #include "tree.h"
 #include <stdio.h>
 #include <ctype.h>
 
 #define MAXWORD 100
+int getword(char *, int); /* Reused from keywords */
 
 /* word frequency count */
 int main(void)
